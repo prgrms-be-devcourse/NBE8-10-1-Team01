@@ -1,0 +1,85 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/gc-coffee/node_modules
+/gc-coffee/.pnp
+/gc-coffee/.pnp.*
+/gc-coffee/.yarn/*
+!/gc-coffee/.yarn/patches
+!/gc-coffee/.yarn/plugins
+!/gc-coffee/.yarn/releases
+!/gc-coffee/.yarn/versions
+
+# testing
+/gc-coffee/coverage
+
+# next.js
+/gc-coffee/.next/   # Next.js 빌드 캐시 폴더
+/gc-coffee/out/     # Next.js export 폴더
+
+# production
+/gc-coffee/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (can opt-in for committing if needed)
+/gc-coffee/.env* # gc-coffee 폴더 내의 환경 변수 파일
+
+# vercel
+/gc-coffee/.vercel
+
+# typescript
+/gc-coffee/*.tsbuildinfo
+/gc-coffee/next-env.d.ts
+
+# Spring Project Directory Prefix
+# /NBE8-10-1-Team01_Spring/
+
+/NBE8-10-1-Team01_Spring/.gradle
+/NBE8-10-1-Team01_Spring/build/
+!/NBE8-10-1-Team01_Spring/gradle/wrapper/gradle-wrapper.jar
+!/NBE8-10-1-Team01_Spring/**/src/main/**/build/
+!/NBE8-10-1-Team01_Spring/**/src/test/**/build/
+
+### STS (Spring Tool Suite) ###
+/NBE8-10-1-Team01_Spring/.apt_generated
+/NBE8-10-1-Team01_Spring/.classpath
+/NBE8-10-1-Team01_Spring/.factorypath
+/NBE8-10-1-Team01_Spring/.project
+/NBE8-10-1-Team01_Spring/.settings
+/NBE8-10-1-Team01_Spring/.springBeans
+/NBE8-10-1-Team01_Spring/.sts4-cache
+/NBE8-10-1-Team01_Spring/bin/
+!/NBE8-10-1-Team01_Spring/**/src/main/**/bin/
+!/NBE8-10-1-Team01_Spring/**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+/NBE8-10-1-Team01_Spring/.idea
+/NBE8-10-1-Team01_Spring/*.iws
+/NBE8-10-1-Team01_Spring/*.iml
+/NBE8-10-1-Team01_Spring/*.ipr
+/NBE8-10-1-Team01_Spring/out/
+!/NBE8-10-1-Team01_Spring/**/src/main/**/out/
+!/NBE8-10-1-Team01_Spring/**/src/test/**/out/
+
+### NetBeans ###
+/NBE8-10-1-Team01_Spring/nbproject/private/
+/NBE8-10-1-Team01_Spring/nbbuild/
+/NBE8-10-1-Team01_Spring/dist/
+/NBE8-10-1-Team01_Spring/nbdist/
+/NBE8-10-1-Team01_Spring/.nb-gradle/
+
+### VS Code ###
+/NBE8-10-1-Team01_Spring/.vscode/
+
+### Custom (H2 Database Files) ###
+/NBE8-10-1-Team01_Spring/db_dev.mv.db
+/NBE8-10-1-Team01_Spring/db_dev.trace.db
