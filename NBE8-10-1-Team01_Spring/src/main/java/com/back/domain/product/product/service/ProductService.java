@@ -1,24 +1,21 @@
 package com.back.domain.product.product.service;
 
-
-import com.back.domain.customer.customer.repository.CustomerRepository;
 import com.back.domain.product.product.dto.ProductCreateRequest;
 import com.back.domain.product.product.dto.ProductCreateResponse;
+import com.back.domain.product.product.dto.ProductListResponse;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.repository.ProductRepository;
-
-
-import com.back.domain.product.product.dto.ProductCreateRequest;
-import com.back.domain.product.product.dto.ProductCreateResponse;
 import com.back.domain.product.product.dto.ProductUpdateRequest;
-import com.back.domain.product.product.entity.Product;
-import com.back.domain.product.product.repository.ProductRepository;
 import com.back.global.exception.product.InvalidProductException;
 import com.back.global.fileStorage.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +24,29 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final FileStorageService fileStorageService;
+
+    // 상품리스트 조회 메서드
+    // 이미지 경로 mapping하여 url로 전송합니다.
+    public ProductListResponse getProducts() {
+        // 전체 상품 조회
+        List<Product> products = productRepository.findAll();
+
+        List<ProductListResponse.ProductDto> productDtos = new ArrayList<>();
+
+        for (Product product : products) {
+            ProductListResponse.ProductDto dto = new ProductListResponse.ProductDto();
+            dto.setProductId(product.getId());
+            dto.setName(product.getName());
+            dto.setPrice(product.getPrice());
+            dto.setImage("/api/products/images/" + product.getImagePath());
+
+            productDtos.add(dto);
+        }
+
+        ProductListResponse response = new ProductListResponse();
+        response.setData(productDtos);
+        return response;
+    }
 
     @Transactional
     public ProductCreateResponse createProduct(ProductCreateRequest request, MultipartFile image) {
