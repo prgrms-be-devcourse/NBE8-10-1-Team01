@@ -3,6 +3,7 @@ package com.back.global.exception;
 import com.back.global.exception.customer.CustomerNotFoundException;
 import com.back.global.exception.file.FileStorageException;
 import com.back.global.exception.product.InvalidProductException;
+import com.back.global.exception.product.ProductNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -19,6 +20,20 @@ import java.util.Map;
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    /**
+     * 상품 미발견 예외 처리
+     * 요청한 상품 ID로 상품을 찾을 수 없는 경우 처리
+     *
+     * @param ex 발생한 ProductNotFoundException
+     * @return 404 Not Found와 에러 메시지
+     */
+    @ExceptionHandler(ProductNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleProductNotFoundException(ProductNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
 
     /**
      * 상품 검증 실패 예외 처리
