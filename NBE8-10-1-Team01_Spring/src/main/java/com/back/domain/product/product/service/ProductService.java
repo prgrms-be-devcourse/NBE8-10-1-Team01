@@ -1,11 +1,18 @@
 package com.back.domain.product.product.service;
 
+
 import com.back.domain.customer.customer.repository.CustomerRepository;
 import com.back.domain.product.product.dto.ProductCreateRequest;
 import com.back.domain.product.product.dto.ProductCreateResponse;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.repository.ProductRepository;
 
+
+import com.back.domain.product.product.dto.ProductCreateRequest;
+import com.back.domain.product.product.dto.ProductCreateResponse;
+import com.back.domain.product.product.dto.ProductUpdateRequest;
+import com.back.domain.product.product.entity.Product;
+import com.back.domain.product.product.repository.ProductRepository;
 import com.back.global.exception.product.InvalidProductException;
 import com.back.global.fileStorage.FileStorageService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +51,21 @@ public class ProductService {
         response.setMessage("상품 등록이 완료되었습니다");
         return response;
 
+    }
+
+    @Transactional
+    public void updateProduct(Long productId, ProductUpdateRequest request, MultipartFile image) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new InvalidProductException("해당 상품이 없습니다.id=" + productId));
+
+        if (request.getName() != null) product.setName(request.getName());
+        if (request.getPrice() != null) product.setPrice(request.getPrice());
+        if (request.getDescription() != null) product.setDescription(request.getDescription());
+        if (image != null && !image.isEmpty()) {
+            String imagePath = fileStorageService.storeFile(image);
+            product.setImagePath(imagePath);
+        }
     }
 
     private void validateProductRequest(ProductCreateRequest request) {
