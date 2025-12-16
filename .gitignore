@@ -87,3 +87,7 @@ yarn-error.log*
 ### File Upload Directories ###
 /NBE8-10-1-Team01_Spring/uploads/
 /NBE8-10-1-Team01_Spring/test-uploads/
+
+### Custom ###
+**/.idea/
+**/.next/
