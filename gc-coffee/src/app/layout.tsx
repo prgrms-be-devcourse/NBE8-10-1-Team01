@@ -16,24 +16,47 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body
-        className={`antialiased min-h-screen flex flex-col`}
+        className={`bg-gray-50 text-gray-800 antialiased min-h-screen flex flex-col`}
       >
-        <header>
-          <nav className="flex">
-            <Link href="/" className="p-2 rounded hover:bg-gray-100">
-              메인
-            </Link>
-            <Link href="/posts" className="p-2 rounded hover:bg-gray-100">
-              장바구니
-            </Link>
-            <Link href="/posts" className="p-2 rounded hover:bg-gray-100">
-              관리자
-            </Link>
-          </nav>
+        <header className="bg-stone-700 shadow-md">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="flex items-center justify-between h-16">
+              <Link href="/" className="text-xl font-bold text-amber-50 hover:text-amber-100 transition duration-150">
+                ☕ Site A
+              </Link>
+              
+              <div className="flex space-x-4">
+                <Link 
+                  href="/orderList/emailCheck" 
+                  className="px-3 py-2 rounded-md text-sm font-medium text-amber-50 hover:bg-stone-600 transition duration-150"
+                >
+                  로그인
+                </Link>
+                <Link 
+                  href="/order" 
+                  className="px-3 py-2 rounded-md text-sm font-medium text-amber-50 hover:bg-stone-600 transition duration-150"
+                >
+                  장바구니
+                </Link>
+                <Link 
+                  href="/admin" 
+                  className="px-3 py-2 rounded-md text-sm font-medium text-amber-50 hover:bg-stone-600 transition duration-150"
+                >
+                  관리자
+                </Link>
+              </div>
+            </nav>
+          </div>
         </header>
-        <main className="flex-1 flex flex-col">{children}</main>
-        <footer className="text-cneter p-2">
-          <p>Copyright 2025. Site A. All rights reserved.</p>
+
+        <main className="flex-1 flex flex-col max-w-7xl mx-auto w-full p-4 sm:p-6 lg:p-8">
+          {children}
+        </main>
+       
+        <footer className="bg-stone-200 border-t border-stone-300">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 text-center text-sm text-stone-600">
+            <p>Copyright 2025. Site A. All rights reserved.</p>
+          </div>
         </footer>
       </body>
     </html>
