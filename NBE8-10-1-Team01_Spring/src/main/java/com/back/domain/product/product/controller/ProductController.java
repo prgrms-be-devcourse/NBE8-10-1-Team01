@@ -2,9 +2,8 @@ package com.back.domain.product.product.controller;
 
 import com.back.domain.product.product.dto.ProductCreateRequest;
 import com.back.domain.product.product.dto.ProductCreateResponse;
-
 import com.back.domain.product.product.dto.ProductUpdateRequest;
-
+import com.back.domain.product.product.dto.ProductListResponse;
 import com.back.domain.product.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,12 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @RestController
 @RequestMapping("/api/products")
 @RequiredArgsConstructor
 public class ProductController {
 
     private final ProductService productService;
+
+    @GetMapping
+    public ResponseEntity<ProductListResponse> getProducts() {
+        ProductListResponse response = productService.getProducts();
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ProductCreateResponse> createProduct(
