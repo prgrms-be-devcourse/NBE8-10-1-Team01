@@ -1,12 +1,10 @@
 package com.back.domain.product.product.service;
 
-import com.back.domain.product.product.dto.ProductCreateRequest;
-import com.back.domain.product.product.dto.ProductCreateResponse;
-import com.back.domain.product.product.dto.ProductListResponse;
+import com.back.domain.product.product.dto.*;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.repository.ProductRepository;
-import com.back.domain.product.product.dto.ProductUpdateRequest;
 import com.back.global.exception.product.InvalidProductException;
+import com.back.global.exception.product.ProductNotFoundException;
 import com.back.global.fileStorage.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,8 +23,7 @@ public class ProductService {
     private final ProductRepository productRepository;
     private final FileStorageService fileStorageService;
 
-    // 상품리스트 조회 메서드
-    // 이미지 경로 mapping하여 url로 전송합니다.
+
     public ProductListResponse getProducts() {
         // 전체 상품 조회
         List<Product> products = productRepository.findAll();
@@ -47,6 +44,22 @@ public class ProductService {
         response.setData(productDtos);
         return response;
     }
+
+
+    public ProductDetailResponse getProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다. ID: " + productId));
+
+        ProductDetailResponse response = new ProductDetailResponse();
+        response.setProductId(product.getId());
+        response.setName(product.getName());
+        response.setPrice(product.getPrice());
+        response.setDescription(product.getDescription());
+        response.setImage("/api/products/images/" + product.getImagePath());
+
+        return response;
+    }
+
 
     @Transactional
     public ProductCreateResponse createProduct(ProductCreateRequest request, MultipartFile image) {

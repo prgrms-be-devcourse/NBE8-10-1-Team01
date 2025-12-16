@@ -2,6 +2,7 @@ package com.back.domain.product.product.controller;
 
 import com.back.domain.product.product.dto.ProductCreateRequest;
 import com.back.domain.product.product.dto.ProductCreateResponse;
+import com.back.domain.product.product.dto.ProductDetailResponse;
 import com.back.domain.product.product.dto.ProductUpdateRequest;
 import com.back.domain.product.product.dto.ProductListResponse;
 import com.back.domain.product.product.service.ProductService;
@@ -24,9 +25,16 @@ public class ProductController {
 
     private final ProductService productService;
 
+
     @GetMapping
     public ResponseEntity<ProductListResponse> getProducts() {
         ProductListResponse response = productService.getProducts();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ProductDetailResponse> getProduct(@PathVariable Long id) {
+        ProductDetailResponse response = productService.getProduct(id);
         return ResponseEntity.ok(response);
     }
 

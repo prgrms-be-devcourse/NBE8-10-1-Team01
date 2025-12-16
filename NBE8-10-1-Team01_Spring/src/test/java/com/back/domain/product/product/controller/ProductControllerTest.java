@@ -251,5 +251,86 @@ class ProductControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data[0].image", matchesPattern("/api/products/images/[a-f0-9\\-]+\\.png")));
     }
+
+    @Test
+    @DisplayName("상품 상세 조회 성공")
+    void getProduct_Success() throws Exception {
+        // given - 상품 등록
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "test-image.jpg",
+                MediaType.IMAGE_JPEG_VALUE,
+                "test image content".getBytes()
+        );
+
+        String createResponse = mockMvc.perform(multipart("/api/products")
+                        .file(image)
+                        .param("name", "상세 조회 테스트 상품")
+                        .param("price", "25000")
+                        .param("description", "상세 조회용 상품 설명")
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        // productId 추출 (간단한 방법)
+        Long productId = 1L; // 첫 번째 상품이므로 ID는 1
+
+        // when & then
+        mockMvc.perform(get("/api/products/{id}", productId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.productId", is(productId.intValue())))
+                .andExpect(jsonPath("$.name", is("상세 조회 테스트 상품")))
+                .andExpect(jsonPath("$.price", is(25000)))
+                .andExpect(jsonPath("$.description", is("상세 조회용 상품 설명")))
+                .andExpect(jsonPath("$.image", notNullValue()))
+                .andExpect(jsonPath("$.image", startsWith("/api/products/images/")));
+    }
+
+    @Test
+    @DisplayName("상품 상세 조회 실패 - 존재하지 않는 상품")
+    void getProduct_Fail_NotFound() throws Exception {
+        // given
+        Long nonExistentProductId = 999L;
+
+        // when & then
+        mockMvc.perform(get("/api/products/{id}", nonExistentProductId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.error", containsString("상품을 찾을 수 없습니다")));
+    }
+
+    @Test
+    @DisplayName("상품 상세 조회 성공 - 이미지 URL 형식 확인")
+    void getProduct_Success_ImageUrlFormat() throws Exception {
+        // given
+        MockMultipartFile image = new MockMultipartFile(
+                "image",
+                "detail-test.png",
+                MediaType.IMAGE_PNG_VALUE,
+                "detail test image".getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/products")
+                        .file(image)
+                        .param("name", "이미지 URL 테스트")
+                        .param("price", "30000")
+                        .param("description", "상세 조회 이미지 URL 테스트")
+                        .contentType(MediaType.MULTIPART_FORM_DATA))
+                .andExpect(status().isCreated());
+
+        Long productId = 1L;
+
+        // when & then
+        mockMvc.perform(get("/api/products/{id}", productId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.image", matchesPattern("/api/products/images/[a-f0-9\\-]+\\.png")));
+    }
 }
 
