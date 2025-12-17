@@ -2,6 +2,7 @@ package com.back.global.exception;
 
 import com.back.global.exception.customer.CustomerNotFoundException;
 import com.back.global.exception.file.FileStorageException;
+import com.back.global.exception.order.OrderNotFoundException;
 import com.back.global.exception.product.InvalidProductException;
 import com.back.global.exception.product.ProductNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -208,6 +209,19 @@ public class GlobalExceptionHandler {
         Map<String, String> errorResponse = new HashMap<>();
         errorResponse.put("error", "서버 오류가 발생했습니다");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+     /** 주문 미발견 예외 처리
+     * 요청한 주문 ID로 주문을 찾을 수 없는 경우 처리
+     *
+     * @param ex 발생한 OrderNotFoundException
+     * @return 404 Not Found와 에러 메시지
+     */
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleOrderNotFoundException(OrderNotFoundException ex) {
+        Map<String, String> errorResponse = new HashMap<>();
+        errorResponse.put("error", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
 }
