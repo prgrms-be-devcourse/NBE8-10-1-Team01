@@ -36,4 +36,10 @@ public class OrderController {
                 )
                 .toList();
     }
+
+    @DeleteMapping("/{orderId}")
+    public void deleteOrder(@PathVariable("orderId") Long orderId) {
+        orderService.deleteOrder(orderId);
+    }
+
 }

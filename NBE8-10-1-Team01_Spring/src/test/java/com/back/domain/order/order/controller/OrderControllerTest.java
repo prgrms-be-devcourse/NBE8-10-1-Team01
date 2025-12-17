@@ -2,8 +2,10 @@ package com.back.domain.order.order.controller;
 
 import com.back.domain.order.order.entity.Orders;
 import com.back.domain.order.order.repository.OrderRepository;
+import com.back.domain.order.order.service.OrderService;
 import com.back.domain.product.product.entity.Product;
 import com.back.domain.product.product.repository.ProductRepository;
+import com.back.global.exception.order.OrderNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,8 +18,14 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.Mockito.doNothing;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -34,6 +42,10 @@ class OrderControllerTest {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private OrderService orderService;
+
 
     private Orders testOrder;
 
@@ -88,5 +100,33 @@ class OrderControllerTest {
                 .andExpect(jsonPath("$[0].count").value(3))
                 .andExpect(jsonPath("$[1].productName").value("상품 B"))
                 .andExpect(jsonPath("$[1].count").value(5));
+    }
+
+    @Test
+    @DisplayName("주문 삭제 성공")
+    void deleteOrderTest() {
+        // given: 삭제할 주문 미리 저장
+        Orders savedOrder = orderRepository.save(new Orders(1L)); // userId=1인 주문 생성
+        Long orderId = savedOrder.getId();
+
+        // when: 서비스로 삭제
+        orderService.deleteOrder(orderId);
+
+        // then: 리포지토리에서 조회했을 때 없어야 함
+        Optional<Orders> deletedOrder = orderRepository.findById(orderId);
+
+        assertThat(deletedOrder).isEmpty();
+    }
+
+    @Test
+    @DisplayName("주문 삭제 실패 - 존재하지 않는 ID")
+    void deleteOrder_Fail() {
+        // given
+        Long nonExistentOrderId = 9999L;
+
+        // when & then
+        assertThatThrownBy(() -> orderService.deleteOrder(nonExistentOrderId))
+                .isInstanceOf(OrderNotFoundException.class)
+                .hasMessageContaining("해당 주문이 없습니다. ID: " + nonExistentOrderId);
     }
 }
