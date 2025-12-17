@@ -101,6 +101,15 @@ public class ProductService {
         }
     }
 
+    @Transactional
+    public void deleteProduct(Long productId) {
+
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다. ID: " + productId));
+
+        productRepository.delete(product);
+    }
+
     private void validateProductRequest(ProductCreateRequest request) {
         // 필수 필드 검증
         if (request.getName() == null || request.getName().trim().isEmpty()) {
@@ -116,5 +125,6 @@ public class ProductService {
             throw new InvalidProductException("가격은 0보다 커야 합니다.");
         }
     }
+
 
 }
