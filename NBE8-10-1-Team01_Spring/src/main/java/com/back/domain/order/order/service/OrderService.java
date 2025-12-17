@@ -88,16 +88,10 @@ public class OrderService {
 
         Orders saved = orderRepository.save(order);
 
-        List<OrderItemDto> items = saved.getOrderItems().stream()
-                .map(OrderItemDto::new)
-                .toList();
-
         OrderCreateResponse response = new OrderCreateResponse();
         response.setOrderId(saved.getId());
-        response.setCustomerId(saved.getCustomer().getId());
-        response.setCreateDate(saved.getCreateDate());
-        response.setItems(items);
-        response.setMessage("주문이 완료되었습니다");
+        response.setCreateAt(saved.getCreateDate());
+
         return response;
     }
     //전날14~당일14 구간
