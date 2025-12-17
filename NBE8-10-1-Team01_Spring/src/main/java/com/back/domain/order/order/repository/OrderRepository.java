@@ -7,5 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
-    List<Orders> findByUserIdOrderByCreateDateDesc(Long userId);
+    // Orders.customer.id 를 의미 (중첩 프로퍼티)
+    List<Orders> findByCustomer_IdOrderByCreateDateDesc(Long customerId);
 }

@@ -5,20 +5,52 @@ import com.back.domain.order.order.entity.OrderItem;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record OrderItemDto(
-        Long productId,
-        String productName,
-        Integer count,
-        Integer price,
-        LocalDateTime createdAt
-) {
+public class OrderItemDto {
+
+    private Long productId;
+    private String productName;
+    private Integer count;
+    private Integer price;
+
+    public OrderItemDto() {
+    }
+
     public OrderItemDto(OrderItem item) {
-        this(
-                item.getProduct().getId(),
-                item.getProduct().getName(),
-                item.getCount(),
-                item.getProduct().getPrice(),
-                item.getOrders().getCreateDate()
-        );
+        this.productId = item.getProduct().getId();
+        this.productName = item.getProduct().getName();
+        this.count = item.getCount();
+        this.price = item.getProduct().getPrice();
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
     }
 }
