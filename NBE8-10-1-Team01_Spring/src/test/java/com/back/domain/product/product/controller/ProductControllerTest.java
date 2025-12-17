@@ -301,7 +301,7 @@ class ProductControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error", containsString("상품을 찾을 수 없습니다")));
+                .andExpect(jsonPath("$.error", is("상품을 찾을 수 없습니다")));
     }
 
     @Test

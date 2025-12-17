@@ -48,7 +48,7 @@ public class ProductService {
 
     public ProductDetailResponse getProduct(Long productId) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다. ID: " + productId));
+                .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다"));
 
         ProductDetailResponse response = new ProductDetailResponse();
         response.setProductId(product.getId());
@@ -90,7 +90,7 @@ public class ProductService {
     public void updateProduct(Long productId, ProductUpdateRequest request, MultipartFile image) {
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new InvalidProductException("해당 상품이 없습니다.id=" + productId));
+                .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다"));
 
         if (request.getName() != null) product.setName(request.getName());
         if (request.getPrice() != null) product.setPrice(request.getPrice());
@@ -113,16 +113,16 @@ public class ProductService {
     private void validateProductRequest(ProductCreateRequest request) {
         // 필수 필드 검증
         if (request.getName() == null || request.getName().trim().isEmpty()) {
-            throw new InvalidProductException("상품명은 필수입니다.");
+            throw new InvalidProductException("상품명은 필수입니다");
         }
 
         if (request.getPrice() == null) {
-            throw new InvalidProductException("가격은 필수입니다.");
+            throw new InvalidProductException("가격은 필수입니다");
         }
 
         // 가격 범위 검증
         if (request.getPrice() <= 0) {
-            throw new InvalidProductException("가격은 0보다 커야 합니다.");
+            throw new InvalidProductException("가격은 0보다 커야 합니다");
         }
     }
 

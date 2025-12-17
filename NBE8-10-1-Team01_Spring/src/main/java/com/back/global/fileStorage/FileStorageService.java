@@ -24,7 +24,7 @@ public class FileStorageService {
         try {
             Files.createDirectories(this.fileStorageLocation);
         } catch (IOException ex) {
-            throw new FileStorageException("파일 저장 디렉토리를 생성할 수 없습니다.", ex);
+            throw new FileStorageException("파일 저장 디렉토리 생성 실패", ex);
         }
     }
 
@@ -37,13 +37,13 @@ public class FileStorageService {
     public String storeFile(MultipartFile file) {
         String originalFileName = file.getOriginalFilename();
         if (originalFileName == null || originalFileName.isEmpty()) {
-            throw new FileStorageException("파일명이 유효하지 않습니다.");
+            throw new FileStorageException("파일명이 유효하지 않습니다");
         }
         originalFileName = StringUtils.cleanPath(originalFileName);
 
         try {
             if (originalFileName.contains("..")) {
-                throw new FileStorageException("파일명에 부적절한 경로가 포함되어 있습니다: " + originalFileName);
+                throw new FileStorageException("잘못된 파일 경로입니다");
             }
 
             // 고유한 파일명 생성
@@ -59,7 +59,7 @@ public class FileStorageService {
 
             return uniqueFileName;
         } catch (IOException ex) {
-            throw new FileStorageException("파일 " + originalFileName + "을 저장할 수 없습니다.", ex);
+            throw new FileStorageException("파일 저장에 실패했습니다", ex);
         }
     }
 
@@ -73,11 +73,11 @@ public class FileStorageService {
         try {
             Path filePath = this.fileStorageLocation.resolve(fileName).normalize();
             if (!Files.exists(filePath)) {
-                throw new FileStorageException("파일을 찾을 수 없습니다: " + fileName);
+                throw new FileStorageException("파일을 찾을 수 없습니다");
             }
             return filePath;
         } catch (Exception ex) {
-            throw new FileStorageException("파일을 로드할 수 없습니다: " + fileName, ex);
+            throw new FileStorageException("파일 로드에 실패했습니다", ex);
         }
     }
 }
