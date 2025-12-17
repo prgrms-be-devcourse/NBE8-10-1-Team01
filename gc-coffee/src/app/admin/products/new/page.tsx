@@ -14,7 +14,7 @@ interface Product {
 
 export default function NewProduct() {
   const router = useRouter();
-  
+
   const [formData, setFormData] = useState<Product>({
     name: '',
     content: '',
@@ -29,9 +29,11 @@ export default function NewProduct() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetch("");
+    const SERVER_URL = "http://localhost:8080";
+    const headers = new Headers();
+    fetch(SERVER_URL + "/api/products", { headers: headers ,method:"POST"});
+    router.replace("/admin");
   };
-
 
   return (
     <>
@@ -106,7 +108,7 @@ export default function NewProduct() {
                   <button
                     type="button"
                     className="flex-1 py-3 rounded-xl border border-stone-300 text-stone-600 font-medium hover:bg-stone-50 transition hover:cursor-pointer"
-                    onClick={()=>router.push("/admin")}
+                    onClick={() => router.push("/admin")}
                   >
                     취소
                   </button>
