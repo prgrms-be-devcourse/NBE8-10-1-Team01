@@ -57,7 +57,7 @@ export default function RootLayout({
                 
                 {/* 2. 장바구니 담기 링크 (CTA 버튼 스타일) */}
                 <Link 
-                    href="/cart/add"
+                    href="/order"
                     className="bg-gradient-to-r from-orange-400 to-amber-500 text-amber-900 px-6 py-2.5 rounded-full font-medium hover:shadow-lg hover:scale-105 transition-all"
                 >
                     장바구니 담기
