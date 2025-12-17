@@ -1,10 +1,6 @@
 package com.back.domain.order.order.controller;
 
-import com.back.domain.order.order.dto.OrderCreateRequest;
-import com.back.domain.order.order.dto.OrderCreateResponse;
-import com.back.domain.order.order.dto.OrderDeleteResponse;
-import com.back.domain.order.order.dto.OrderDto;
-import com.back.domain.order.order.dto.OrderItemDto;
+import com.back.domain.order.order.dto.*;
 import com.back.domain.order.order.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -45,17 +41,7 @@ public class OrderController {
                             value = """
                                     {
                                       "orderId": 1,
-                                      "customerId": 1,
-                                      "createDate": "2025-12-17T10:30:00",
-                                      "items": [
-                                        {
-                                          "productId": 2,
-                                          "productName": "수정",
-                                          "count": 2,
-                                          "price": 1000
-                                        }
-                                      ],
-                                      "message": "주문이 완료되었습니다"
+                                      "createAt": "2025-12-17T10:30:00"
                                     }
                                     """
                     )
@@ -91,24 +77,26 @@ public class OrderController {
             description = "주문 아이템 조회 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = OrderItemDto.class),
+                    schema = @Schema(implementation = OrderListResponse.class),
                     examples = @ExampleObject(
                             name = "주문 아이템 목록 예시",
                             value = """
-                                    [
-                                      {
-                                        "productId": 2,
-                                        "productName": "수정",
-                                        "count": 2,
-                                        "price": 1000
-                                      },
-                                      {
-                                        "productId": 3,
-                                        "productName": "선풍기",
-                                        "count": 1,
-                                        "price": 50000
-                                      }
-                                    ]
+                                    {
+                                      "data": [
+                                        {
+                                          "productId": 2,
+                                          "productName": "수정",
+                                          "count": 2,
+                                          "price": 1000
+                                        },
+                                        {
+                                          "productId": 3,
+                                          "productName": "선풍기",
+                                          "count": 1,
+                                          "price": 50000
+                                        }
+                                      ]
+                                    }
                                     """
                     )
             )
@@ -127,8 +115,8 @@ public class OrderController {
                     )
             )
     )
-    public ResponseEntity<List<OrderItemDto>> getUserOrders(@PathVariable Long customerId) {
-        return ResponseEntity.ok(orderService.getUserOrders(customerId));
+    public ResponseEntity<OrderListResponse<List<OrderItemDto>>> getUserOrders(@PathVariable Long customerId) {
+        return ResponseEntity.ok(OrderListResponse.of(orderService.getUserOrders(customerId)));
     }
 
     //모든 주문 내역 조회
@@ -142,35 +130,38 @@ public class OrderController {
             description = "주문 내역 조회 성공",
             content = @Content(
                     mediaType = "application/json",
-                    schema = @Schema(implementation = OrderDto.class),
+                    schema = @Schema(implementation = OrderListResponse.class),
                     examples = @ExampleObject(
                             name = "주문 내역 목록 예시",
                             value = """
-                                    [
-                                      {
-                                        "orderId": 1,
-                                        "customerId": 1,
-                                        "customerEmail": "test@example.com",
-                                        "customerAddress": "서울시 강남구",
-                                        "customerPostcode": "12345",
-                                        "createDate": "2025-12-17T10:30:00",
-                                        "orderItems": [
-                                          {
-                                            "productId": 2,
-                                            "productName": "수정",
-                                            "count": 2,
-                                            "price": 1000
-                                          }
-                                        ]
-                                      }
-                                    ]
+                                    {
+                                      "data": [
+                                        {
+                                          "orderId": 1,
+                                          "customerId": 1,
+                                          "customerEmail": "test@example.com",
+                                          "customerAddress": "서울시 강남구",
+                                          "customerPostcode": "12345",
+                                          "createDate": "2025-12-17T10:30:00",
+                                          "orderItems": [
+                                            {
+                                              "productId": 2,
+                                              "productName": "수정",
+                                              "count": 2,
+                                              "price": 1000
+                                            }
+                                          ]
+                                        }
+                                      ]
+                                    }
                                     """
                     )
             )
     )
-    public ResponseEntity<List<OrderDto>> getAllOrders() {
-        return ResponseEntity.ok(orderService.getAllOrders());
+    public ResponseEntity<OrderListResponse<List<OrderDto>>> getAllOrders() {
+        return ResponseEntity.ok(OrderListResponse.of(orderService.getAllOrders()));
     }
+
 
     @DeleteMapping("/{orderId}")
     @Operation(
