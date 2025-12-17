@@ -51,22 +51,6 @@ public class BaseInitData {
                     .build();
 
             productRepository.saveAll(List.of(p1, p2, p3));
-
-            // 2. 주문(Order) 3개 생성
-            Orders order1 = new Orders();
-            order1.addItem(p1, 1);
-            order1.addItem(p2, 2);
-            orderRepository.save(order1);
-
-            Orders order2 = new Orders();
-            order2.addItem(p3, 5);
-            orderRepository.save(order2);
-
-            Orders order3 = new Orders();
-            order3.addItem(p1, 1);
-            order3.addItem(p2, 1);
-            order3.addItem(p3, 1);
-            orderRepository.save(order3);
         };
     }
 }
