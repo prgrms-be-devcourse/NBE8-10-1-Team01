@@ -17,6 +17,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -59,8 +63,21 @@ public class OrderService {
                                 .build()
                 ));
 
-        Orders order = new Orders();
-        order.assignCustomer(customer);
+        // 14시 기준 주문 구간 계산
+        LocalDateTime now = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        LocalDateTime windowStart = getOrderWindowStart(now);     // 포함
+        LocalDateTime windowEnd = windowStart.plusDays(1);        // 미포함 (다음날 14:00)
+
+        // 해당 구간에 이미 주문이 있으면 그 주문을 재사용, 없으면 새로 생성
+        Orders order = orderRepository
+                .findTopByCustomer_IdAndCreateDateBetweenOrderByCreateDateDesc(
+                        customer.getId(), windowStart, windowEnd
+                )
+                .orElseGet(() -> {
+                    Orders newOrder = new Orders();
+                    newOrder.assignCustomer(customer);
+                    return newOrder;
+                });
 
         for (OrderCreateRequest.ProductDto p : request.getProducts()) {
             Product product = productRepository.findById(p.getProductId())
@@ -82,6 +99,18 @@ public class OrderService {
         response.setItems(items);
         response.setMessage("주문이 완료되었습니다");
         return response;
+    }
+    //전날14~당일14 구간
+    private LocalDateTime getOrderWindowStart(LocalDateTime now) {
+        LocalDate today = now.toLocalDate();
+        LocalDateTime today14 = LocalDateTime.of(today, LocalTime.of(14, 0));
+
+        // 14시 이전이면 전날 14시부터가 현재 구간 시작
+        if (now.isBefore(today14)) {
+            return today14.minusDays(1);
+        }
+        // 14시 이후(포함)이면 오늘 14시가 구간 시작
+        return today14;
     }
 
     public void deleteOrder(Long orderId) {
