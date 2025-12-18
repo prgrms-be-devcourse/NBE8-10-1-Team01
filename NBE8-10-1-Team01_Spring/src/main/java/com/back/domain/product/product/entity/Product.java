@@ -3,6 +3,8 @@ package com.back.domain.product.product.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "products")
 @Getter
@@ -27,6 +29,15 @@ public class Product {
 
     @Column(nullable = false)
     private String imagePath;
+
+    /**
+     * 상품 상태 (ACTIVE: 활성, DELETED: 삭제됨)
+     * 기본값은 ACTIVE
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private ProductStatus status = ProductStatus.ACTIVE;
 
 
 }

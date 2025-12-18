@@ -2,6 +2,7 @@ package com.back.domain.product.product.service;
 
 import com.back.domain.product.product.dto.*;
 import com.back.domain.product.product.entity.Product;
+import com.back.domain.product.product.entity.ProductStatus;
 import com.back.domain.product.product.repository.ProductRepository;
 import com.back.global.exception.product.InvalidProductException;
 import com.back.global.exception.product.ProductNotFoundException;
@@ -10,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +25,8 @@ public class ProductService {
 
 
     public ProductListResponse getProducts() {
-        // 전체 상품 조회
-        List<Product> products = productRepository.findAll();
+        // 활성 상태 상품만 조회 (소프트 삭제된 상품 제외)
+        List<Product> products = productRepository.findAllActive();
 
         List<ProductListResponse.ProductDto> productDtos = new ArrayList<>();
 
@@ -48,7 +48,8 @@ public class ProductService {
 
 
     public ProductDetailResponse getProduct(Long productId) {
-        Product product = productRepository.findById(productId)
+        // 활성 상태 상품만 조회 (삭제된 상품은 조회 불가)
+        Product product = productRepository.findByIdAndActive(productId)
                 .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다"));
 
         ProductDetailResponse response = new ProductDetailResponse();
@@ -70,12 +71,13 @@ public class ProductService {
         // 파일 저장
         String imagePath = fileStorageService.storeFile(image);
 
-        Product product = new Product();
-        product.setName(request.getName());
-        product.setPrice(request.getPrice());
-        product.setDescription(request.getDescription());
-        product.setImagePath(imagePath);
-
+        Product product = Product.builder()
+                .name(request.getName())
+                .price(request.getPrice())
+                .description(request.getDescription())
+                .imagePath(imagePath)
+                .status(ProductStatus.ACTIVE)  // 신규 상품은 활성 상태로 생성
+                .build();
 
         // 저장
         Product savedProduct = productRepository.save(product);
@@ -104,11 +106,15 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(Long productId) {
-
-        Product product = productRepository.findById(productId)
+        // 활성 상태 상품만 조회 가능
+        Product product = productRepository.findByIdAndActive(productId)
                 .orElseThrow(() -> new ProductNotFoundException("상품을 찾을 수 없습니다. ID: " + productId));
 
-        productRepository.delete(product);
+        // 소프트 삭제: 실제 DELETE 대신 상태만 변경
+        product.setStatus(ProductStatus.DELETED);
+
+        // JPA의 변경 감지(Dirty Checking)로 자동 UPDATE
+        // productRepository.save() 호출 불필요
     }
 
     private void validateProductRequest(ProductCreateRequest request) {
