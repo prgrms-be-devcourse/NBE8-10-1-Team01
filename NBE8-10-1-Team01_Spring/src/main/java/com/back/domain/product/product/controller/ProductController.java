@@ -30,7 +30,7 @@ public class ProductController {
 
     @GetMapping
     @Operation(
-            summary = "상품 목록 조회",
+            summary = "상품 리스트 조회",
             description = "등록된 상품 목록을 조회합니다."
     )
     @ApiResponse(
@@ -45,8 +45,9 @@ public class ProductController {
                                     {
                                       "data": [
                                         {
-                                          "productId": 2,
-                                          "name": "수정",
+                                          "productId": 1,
+                                          "name": "커피",
+                                            "description": "신선한 원두로 만든 커피입니다.",
                                           "price": 1000,
                                           "image": "/api/products/images/27f59056-b059-408e-a9ff-54078d07e15e.png"
                                         }
@@ -167,7 +168,11 @@ public class ProductController {
             content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = String.class),
-                    examples = @ExampleObject(value = "상품 수정 완료")
+                    examples = @ExampleObject(value = """
+                    {
+                    "message": "상품 수정 완료"
+                    }
+            """)
             )
     )
     public ResponseEntity<String> updateProduct(
@@ -196,9 +201,13 @@ public class ProductController {
             responseCode = "200",
             description = "상품 삭제 성공",
             content = @Content(
-                    mediaType = "text/plain",
+                    mediaType = "application/json",
                     schema = @Schema(implementation = String.class),
-                    examples = @ExampleObject(value = "상품 삭제 완료")
+                    examples = @ExampleObject(value = """
+                    {
+                    "message": "상품 삭제 완료"
+                    }
+            """)
             )
     )
     public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
