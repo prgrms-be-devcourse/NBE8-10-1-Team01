@@ -1,15 +1,38 @@
 "use client"
 
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export default function OrderLookupForm() {
-  const [email, setEmail] = useState('');
+  const router = useRouter();
+  
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.target as HTMLFormElement;
+    const email = form.elements.namedItem("email") as HTMLInputElement;
+    email.value = email.value.trim();
 
-  const handleSubmit = () => {
-    if (email) {
-      console.log('조회할 이메일:', email);
-      alert(`이메일 조회: ${email}`);
-    }
+    const SERVER_URL = "http://localhost:8080"
+    fetch(`${SERVER_URL}/api/users`, {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify({
+        email: email.value
+      }),
+    })
+    .then(res=>{
+      if(!res.ok){
+        return res.json().then((err)=>{throw err;})
+      }
+      return res.json();
+    })
+    .then(data=>{
+      router.replace(`/orderList/${data.customerId}`);
+    }).catch((err)=>{
+      alert("존재하지 않는 사용자입니다.")
+    });
   };
 
   return (
@@ -24,29 +47,30 @@ export default function OrderLookupForm() {
             이메일 주소로 주문 내역을 확인하세요
           </p>
 
-          <div className="mb-4">
-            <label
-              htmlFor="email-input"
-              className="block text-sm font-medium text-amber-900 mb-2"
-            >
-              이메일 주소
-            </label>
-            <input
-              id="email-input"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              className="w-full px-4 py-3 border border-amber-300 rounded-lg text-amber-900 placeholder:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
-            />
-          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+              
+              <label
+                htmlFor="email-input"
+                className="block text-sm font-medium text-amber-900 mb-2"
+              >
+                이메일 주소
+              </label>
+              <input
+                id="email"
+                type="email"
+                name="email"
+                placeholder="your@email.com"
+                className="w-full px-4 py-3 border border-amber-300 rounded-lg text-amber-900 placeholder:text-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              />
+            </div>
 
-          <button
-            onClick={handleSubmit}
-            className="w-full bg-amber-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
-          >
-            주문 내역 조회하기
-          </button>
+            <button
+              className="w-full bg-amber-500 text-white font-semibold py-3 px-4 rounded-lg hover:bg-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+            >
+              주문 내역 조회하기
+            </button>
+          </form>
 
           <p className="text-xs text-amber-700 text-center mt-6">
             주문 시 입력하신 이메일 주소를 정확히 입력해주세요
