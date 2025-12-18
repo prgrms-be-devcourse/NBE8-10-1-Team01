@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Script from 'next/script';
+import { useRouter } from "next/navigation";
 
 declare global {
   interface Window {
@@ -9,7 +10,12 @@ declare global {
   }
 }
 
-function Payment({ totalAmount }: any) {
+function Payment({ cart, totalAmount }: {
+  cart: Order[],
+  totalAmount: number
+}) {
+  const router = useRouter();
+
   const [postalCode, setPostalCode] = useState('');
   const [address1, setAddress1] = useState('');
   const [address2, setAddress2] = useState('');
@@ -46,6 +52,44 @@ function Payment({ totalAmount }: any) {
     }
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const form = e.target as HTMLFormElement;
+
+    const emailInput = form.elements.namedItem("email") as HTMLInputElement;
+    emailInput.value = emailInput.value.trim();
+
+    const addressInput = form.elements.namedItem("address2") as HTMLInputElement;
+    addressInput.value = addressInput.value.trim();
+
+    const SERVER_URL = "http://localhost:8080";
+    fetch(SERVER_URL + "/api/orders", {
+      headers:{'Content-Type':'application/json'},
+      method: "POST",
+      body: JSON.stringify({
+        customer: {
+          email: emailInput.value,
+          address: addressInput.value,
+          postcode: postalCode
+        },
+        products: cart.map((item) => ({
+          productId: item.product.productId,
+          count: item.count
+        }))
+      })
+    }).then(res => {
+      if (!res.ok) throw new Error("주문에 실패했습니다.");
+      return res.json();
+    })
+      .then(res => alert("결제가 완료되었습니다."))
+      .catch(err => {
+        console.error(err);
+        alert("에러가 발생했습니다: " + err.message);
+      });
+    router.replace("/");
+  };
+
   return (
     <>
       <Script
@@ -56,13 +100,14 @@ function Payment({ totalAmount }: any) {
         <div className="max-w-xl mx-auto">
           <h2 className="text-3xl font-semibold mb-8 text-amber-900 border-b pb-2">배송 및 결제 정보</h2>
 
-          <form className="flex flex-col space-y-4 p-6 border border-gray-200 rounded-lg shadow-xl bg-white">
+          <form onSubmit={handleSubmit} className="flex flex-col space-y-4 p-6 border border-gray-200 rounded-lg shadow-xl bg-white">
 
             {/* 이메일 입력 */}
             <label className="block text-sm font-medium text-gray-700 mt-2" htmlFor="email">이메일 주소</label>
             <input
               type="email"
               id="email"
+              name="email"
               className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500"
               placeholder="user@example.com"
               required
@@ -104,6 +149,7 @@ function Payment({ totalAmount }: any) {
             <input
               type="text"
               id="address2"
+              name="address2"
               className="mt-1 p-3 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-amber-500 focus:border-amber-500"
               placeholder="상세 주소 (예: 101동 202호)"
               required
@@ -114,6 +160,7 @@ function Payment({ totalAmount }: any) {
             <button
               type="submit"
               className="mt-6 bg-amber-700 hover:bg-amber-800 text-white font-semibold py-3 rounded-md transition duration-200 shadow-lg"
+
             >
               총 {totalAmount.toLocaleString()}원 결제하기
             </button>
@@ -125,7 +172,10 @@ function Payment({ totalAmount }: any) {
   );
 }
 
-function Cart({ cart, totalAmount }: any) {
+function Cart({ cart, totalAmount }: {
+  cart: Order[],
+  totalAmount: number
+}) {
   return (
     <section className="py-16 px-4 bg-white">
       <div className="max-w-4xl mx-auto">
@@ -142,11 +192,11 @@ function Cart({ cart, totalAmount }: any) {
           </thead>
           <tbody className="bg-white divide-y divide-gray-100">
             {cart.map((item) => (
-              <tr key={item.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{item.quantity}개</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">{item.price.toLocaleString()}원</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-800">{(item.quantity * item.price).toLocaleString()}원</td>
+              <tr key={item.product.productId} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.product.name}</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{item.count}개</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">{item.product.price.toLocaleString()}원</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-800">{(item.count * Number(item.product.price)).toLocaleString()}원</td>
               </tr>
             ))}
           </tbody>
@@ -162,39 +212,44 @@ function Cart({ cart, totalAmount }: any) {
   );
 }
 
-function CartAndPayment({cart}:any) {
-  
-  const totalAmount = cart.reduce((acc, item) => acc + item.quantity * item.price, 0);
+function CartAndPayment({ cart }: {
+  cart: Order[]
+}) {
+
+  const totalAmount = cart.reduce((acc, item) => acc + item.count * Number(item.product.price), 0);
 
   return (
     <>
       <Cart cart={cart} totalAmount={totalAmount} />
-      <Payment totalAmount={totalAmount} />
+      <Payment cart={cart} totalAmount={totalAmount} />
     </>
   );
 }
 
-function ItemList({setCart}:any) {
-  const SERVER_URL = "localhost:8080";
-  const [_brandImage, setBrandImage] = useState([]);
+interface Product {
+  productId: number;
+  name: string;
+  description: string;
+  image: string;
+  price: string;
+}
 
+function ItemList({ addToCart }: any) {
+  const [productList, setProductList] = useState<Product[]>([]);
+
+  const SERVER_URL = "http://localhost:8080";
+  const headers = new Headers();
+  headers.set("Content-Type", "application/json; charset=utf-8");
   useEffect(() => {
-    fetch("")
+    fetch(SERVER_URL + "/api/products", { headers: headers })
+      .then(res => res.json())
+      .then(res => setProductList(res.data));
+
   }, []);
 
-  const brandImages = [
-    { name: 'Ethiopia Yirgacheffe', img: 'bg-amber-100', content: "content1" },
-    { name: 'Colombia Supremo', img: 'bg-stone-200', content: "content2" },
-    { name: 'Kenya AA', img: 'bg-orange-100', content: "content3" },
-    { name: 'Brazil Santos', img: 'bg-neutral-200', content: "content4" },
-    { name: 'Guatemala Antigua', img: 'bg-yellow-100', content: "content5" },
-    { name: 'Costa Rica Tarrazu', img: 'bg-amber-50', content: "content6" },
-    { name: 'Peru Organic', img: 'bg-stone-100', content: "content7" },
-    { name: 'Sumatra Mandheling', img: 'bg-orange-50', content: "content8" }
-  ];
 
-  const onClick=(item:any)=>{
-    setCart(item)
+  const onClick = (product: Product) => {
+    addToCart(product);
   };
 
   return (
@@ -203,17 +258,17 @@ function ItemList({setCart}:any) {
         <div className="max-w-7xl mx-auto">
           <h2 className="text-3xl font-semibold mb-8 text-amber-900 border-b pb-2">오늘의 추천 원두</h2>
           <div className="flex space-x-6 overflow-x-auto pb-4">
-            {brandImages.map((image, idx) => (
+            {productList.map((item, idx) => (
               <div
                 key={idx}
                 // 여기에 flex-shrink-0 클래스가 반드시 있어야 가로로 겹치지 않음
                 className={`flex-shrink-0 w-64 p-5 rounded-xl shadow-lg border border-amber-200`}
               >
                 <div className="h-24 w-full mb-3 rounded-md bg-white/70 flex items-center justify-center text-4xl text-amber-800">☕</div>
-                <h3 className="text-lg font-bold text-amber-800 mb-1">{image.name}</h3>
-                <p className="text-sm text-gray-600 mb-4">{image.content}</p>
-                <button className="w-full bg-amber-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition"
-                  onClick={()=>onClick(image)}>
+                <h3 className="text-lg font-bold text-amber-800 mb-1">{item.name}</h3>
+                <p className="text-sm text-gray-600 mb-4">{item.description}</p>
+                <button className="w-full bg-amber-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition cursor-pointer"
+                  onClick={() => onClick(item)}>
                   장바구니 담기
                 </button>
               </div>
@@ -225,20 +280,32 @@ function ItemList({setCart}:any) {
   );
 }
 
-export default function Home() {
-  const [cart, setCart] = useState([
-    { id: 101, name: 'Ethiopia Yirgacheffe', price: 18000 },
-    { id: 102, name: 'Colombia Supremo', price: 15000 },
-  ]);
+interface Order {
+  product: Product
+  count: number;
+}
 
-  const addToCart = (item:any) =>{
-    setCart([...cart,{...item,quantity:quantity+1}])
+export default function Home() {
+  const [cart, setCart] = useState<Order[]>([]);
+
+  const addToCart = (product: Product) => {
+    const isExist = cart.find((item) => item.product.productId === product.productId);
+    if (isExist) {
+      setCart(cart.map((cartItem) => {
+        if (cartItem.product.productId == product.productId) {
+          return { ...cartItem, count: cartItem.count + 1 };
+        }
+        return cartItem;
+      }));
+    } else {
+      setCart([...cart, { product, count: 1 }]);
+    }
   };
 
   return (
     <div className="min-h-screen bg-amber-50">
-      <ItemList setCart={setCart}/>
-      <CartAndPayment cart={cart}/>
+      <ItemList addToCart={addToCart} />
+      <CartAndPayment cart={cart} />
     </div>
   );
 }
