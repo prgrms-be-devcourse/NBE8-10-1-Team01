@@ -2,26 +2,30 @@
 
 import { useEffect, useState } from 'react'
 
+interface Product {
+  name: string;
+  description: string;
+  image: string;
+  price: string;
+}
+
 export default function Home() {
   const backgroundImage = "";
   const backgroundImageURL = `url('${backgroundImage}')`;
 
 
   const SERVER_URL = "localhost:8080";
-  const [_brandImage,setBrandImage] = useState([]);
+  const [_brandImage,setBrandImage] = useState<Product>();
   useEffect(()=>{
-    fetch("")
+    fetch("http:localhost:8080/api/products")
+    .then(res=>res.json())
+    .then(res=>setBrandImage(res.data))
   },[]);
 
   const brandImages = [
-    { name: 'Ethiopia Yirgacheffe', img: 'bg-amber-100',content:"content1" },
-    { name: 'Colombia Supremo', img: 'bg-stone-200' ,content:"content2"},
-    { name: 'Kenya AA', img: 'bg-orange-100' ,content:"content3"},
-    { name: 'Brazil Santos', img: 'bg-neutral-200' ,content:"content4"},
-    { name: 'Guatemala Antigua', img: 'bg-yellow-100' ,content:"content5"},
-    { name: 'Costa Rica Tarrazu', img: 'bg-amber-50' ,content:"content6"},
-    { name: 'Peru Organic', img: 'bg-stone-100' ,content:"content7"},
-    { name: 'Sumatra Mandheling', img: 'bg-orange-50' ,content:"content8"}
+    { name: 'Ethiopia Yirgacheffe', image: 'bg-amber-100',description:"content1" },
+    { name: 'Colombia Supremo', image: 'bg-stone-200' ,description:"content2"},
+    { name: 'Kenya AA', image: 'bg-orange-100' ,description:"content3"}
   ];
 
   return (
@@ -57,10 +61,10 @@ export default function Home() {
             {brandImages.map((brand, index) => (
               <div
                 key={index}
-                className={`${brand.img} rounded-2xl aspect-square flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer shadow-lg`}
+                className={`${brand.image} rounded-2xl aspect-square flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer shadow-lg`}
               >
                 <p className="text-2xl font-bold text-amber-900">{brand.name}</p>
-                <p className="text-gray-600 text-sm mt-1">{brand.content}</p>
+                <p className="text-gray-600 text-sm mt-1">{brand.description}</p>
               </div>
             ))}
           </div>
