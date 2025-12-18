@@ -36,15 +36,9 @@ public class CustomerService {
 
         // 고객 이메일 체크 - DB에 존재하는지 확인
         Customer customer = customerRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    // 고객이 없으면 새로 생성 (간단한 회원가입)
-                    Customer newCustomer = Customer.builder()
-                            .email(email)
-                            .address("")
-                            .postcode("")
-                            .build();
-                    return customerRepository.save(newCustomer);
-                });
+                .orElseThrow(() ->
+                        new IllegalArgumentException("존재하지 않는 이메일입니다.")
+                );
 
         // 고객 리다이렉트
         return CustomerLoginResponse.builder()
