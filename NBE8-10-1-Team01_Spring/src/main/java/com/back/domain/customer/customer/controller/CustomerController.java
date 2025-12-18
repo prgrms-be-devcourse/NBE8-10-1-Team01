@@ -28,7 +28,7 @@ public class CustomerController {
     @PostMapping
     @Operation(
             summary = "고객 로그인",
-            description = "이메일을 확인하여 고객인지 관리자인지 판단하고 리다이렉트 정보를 반환합니다."
+            description = "이메일을 확인하여 로그인 처리 후 고객 ID와 메시지를 반환합니다."
     )
     @ApiResponse(
             responseCode = "200",
@@ -38,11 +38,11 @@ public class CustomerController {
                     schema = @Schema(implementation = CustomerLoginResponse.class),
                     examples = {
                             @ExampleObject(
-                                    name = "고객 로그인",
+                                    name = "로그인 성공",
                                     value = """
                                             {
-                                              "message": "로그인 완료되었습니다",
-                                              "redirectUrl": "/orders"
+                                              "customerId": 1,
+                                              "message": "로그인 완료되었습니다"
                                             }
                                             """
                             ),
@@ -50,8 +50,8 @@ public class CustomerController {
                                     name = "관리자 로그인",
                                     value = """
                                             {
-                                              "message": "로그인 완료되었습니다",
-                                              "redirectUrl": "/admin"
+                                              "customerId": null,
+                                              "message": "관리자 로그인 완료되었습니다"
                                             }
                                             """
                             )
