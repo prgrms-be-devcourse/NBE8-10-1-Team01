@@ -6,36 +6,45 @@ import { useEffect, useState } from "react";
 
 interface Product {
   name: string;
-  content: string;
-  image: string;
+  description: string;
   price: string;
 }
 
 export default function DetailProduct() {
-  const {productIdStr} = useParams();
+  const { productId: productIdStr } = useParams();
   const productId = Number(productIdStr);
-
   const router = useRouter();
-
   const [formData, setFormData] = useState<Product>({
     name: '',
-    content: '',
-    image: '',
+    description: '',
     price: ''
   });
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState("");
 
-  const dummyData = {
-    name: "오트 사이드 카페라떼",
-    content: "유당 불내증 걱정 없는 고소한 귀리 우유 베이스 라떼",
-    image: "https://picsum.photos/200/300".trim(),
-    price: "7,000"
-  };
+  const SERVER_URL = "http://localhost:8080";
+  const headers = new Headers();
+  headers.set("Content-Type", "application/json; charset=utf-8");
+  useEffect(() => {
+    fetch(`${SERVER_URL}/api/products/${productId}`, { headers: headers })
+      .then(res => res.json())
+      .then(data => {
+        setFormData(data);
+        if (data.image) {
+          setPreview(SERVER_URL + data.image);
+        }
+      })
+  }, []);
 
   useEffect(() => {
-    fetch("");
-    
-    setFormData(dummyData);
-  }, []);
+    if (!image) {
+      return;
+    }
+    const url = URL.createObjectURL(image);
+    setPreview(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -44,7 +53,37 @@ export default function DetailProduct() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetch("");
+
+    const form = e.target as HTMLFormElement;
+    const nameInput = form.elements.namedItem("name") as HTMLInputElement;
+    const priceInput = form.elements.namedItem("price") as HTMLInputElement;
+    const descriptionInput = form.elements.namedItem("description") as HTMLInputElement;
+
+    const htmlFormData = new FormData();
+    htmlFormData.append("name", nameInput.value.trim());
+    htmlFormData.append("price", priceInput.value.trim());
+    htmlFormData.append("description", descriptionInput.value.trim());
+    if (image) {
+      htmlFormData.append("image", image);
+    }
+
+    fetch(`${SERVER_URL}/api/products/${productId}`, {
+      method: "PUT",
+      body: htmlFormData
+    })
+    .then(res => {
+      if (res.ok){
+        alert("수정되었습니다.");
+      }else{
+        alert("수정에 실패하셨습니다.");
+      }
+    });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
   };
 
   return (
@@ -67,7 +106,6 @@ export default function DetailProduct() {
                     onChange={handleChange}
                     placeholder="예: 에스프레소 블렌드"
                     className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                    readOnly
                   />
                 </div>
 
@@ -75,50 +113,68 @@ export default function DetailProduct() {
                 <div>
                   <label className="block text-sm font-semibold text-stone-700 mb-1">내용</label>
                   <textarea
-                    name="content"
-                    value={formData.content}
+                    name="description"
+                    value={formData.description}
                     onChange={handleChange}
                     placeholder="상품에 대한 설명을 입력하세요"
                     rows={3}
                     className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                    readOnly
                   />
                 </div>
 
                 {/* 이미지 URL */}
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-1">이미지 URL</label>
+                {/* <div>
+                  <label className="block text-sm font-semibold text-stone-700 mb-1">이미지</label>
                   <input
                     type="text"
                     name="image"
-                    value={formData.image}
+                    value={SERVER_URL + formData.image}
                     onChange={handleChange}
                     placeholder="https://example.com/image.jpg"
                     className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                    readOnly
                   />
-                </div>
+                </div> */}
 
                 <div>
                   <label className="block text-sm font-semibold text-stone-700 mb-1">이미지</label>
-                  <img className="object-contain w-full"
-                  src={formData.image || "https://picsum.photos/500/500"}
-                  alt={formData.name}
-                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="cursor-pointer flex items-center justify-between border border-stone-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition"
+                  >
+                    <span className="text-gray-400">
+                      {
+                        image ? image.name : formData.name
+                      }
+                    </span>
+                    <span className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+                      찾아보기
+                    </span>
+                  </label>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    className="hidden w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition hover:cursor-pointer" />
                 </div>
+                {preview &&
+                  <img className="object-contain w-full"
+                    src={preview}
+                    alt={formData.name}
+                  />
+                }
 
                 {/* 가격 */}
                 <div>
                   <label className="block text-sm font-semibold text-stone-700 mb-1">가격</label>
                   <div className="relative">
                     <input
-                      type="text"
+                      type="number"
                       name="price"
                       value={formData.price}
                       onChange={handleChange}
                       placeholder="0"
                       className="w-full pl-4 pr-10 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                      readOnly
                     />
                     <span className="absolute right-3 top-2 text-stone-500">원</span>
                   </div>
@@ -129,7 +185,6 @@ export default function DetailProduct() {
                   <button
                     type="submit"
                     className="flex-1 py-3 rounded-xl bg-amber-700 text-white font-semibold hover:bg-amber-800 shadow-md shadow-amber-900/10 transition hover:cursor-pointer"
-                    onClick={() => { router.push(`api/admin/products/${productId}/edit`) }}
                   >
                     수정하기
                   </button>
