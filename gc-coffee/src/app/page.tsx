@@ -22,6 +22,7 @@ function ProductList({brandImages}:{
       </div>
     );
   }
+  
   return(
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {brandImages.map((brand, index) => (
@@ -29,7 +30,7 @@ function ProductList({brandImages}:{
                 key={index}
                 className={`rounded-2xl aspect-square flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer shadow-lg`}
               >
-                <img src = {SERVER_URL + brand.image} ></img>
+                <img src = {SERVER_URL + brand.image}></img>
                 <p className="text-2xl font-bold text-amber-900">{brand.name}</p>
                 <p className="text-gray-600 text-sm mt-1">{brand.description}</p>
               </div>
@@ -49,12 +50,6 @@ export default function Home() {
     .then(res=>res.json())
     .then(res=>setBrandImages(res.data))
   },[]);
-
-  // const brandImages = [
-  //   { name: 'Ethiopia Yirgacheffe', image: 'bg-amber-100',description:"content1" },
-  //   { name: 'Colombia Supremo', image: 'bg-stone-200' ,description:"content2"},
-  //   { name: 'Kenya AA', image: 'bg-orange-100' ,description:"content3"}
-  // ];
 
   return (
     <div className="min-h-screen bg-amber-50">
