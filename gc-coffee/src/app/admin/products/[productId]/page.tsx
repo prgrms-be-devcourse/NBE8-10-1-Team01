@@ -6,35 +6,38 @@ import { useEffect, useState } from "react";
 
 interface Product {
   name: string;
-  content: string;
+  description: string;
   image: string;
   price: string;
 }
 
 export default function DetailProduct() {
-  const {productIdStr} = useParams();
+  const {productId:productIdStr} = useParams();
   const productId = Number(productIdStr);
 
   const router = useRouter();
 
   const [formData, setFormData] = useState<Product>({
     name: '',
-    content: '',
+    description: '',
     image: '',
     price: ''
   });
 
-  const dummyData = {
-    name: "오트 사이드 카페라떼",
-    content: "유당 불내증 걱정 없는 고소한 귀리 우유 베이스 라떼",
-    image: "https://picsum.photos/200/300".trim(),
-    price: "7,000"
-  };
+  // const dummyData = {
+  //   name: "오트 사이드 카페라떼",
+  //   content: "유당 불내증 걱정 없는 고소한 귀리 우유 베이스 라떼",
+  //   image: "https://picsum.photos/200/300".trim(),
+  //   price: "7,000"
+  // };
 
+  const SERVER_URL = "http://localhost:8080";
+  const headers = new Headers();
+  headers.set("Content-Type", "application/json; charset=utf-8");
   useEffect(() => {
-    fetch("");
-    
-    setFormData(dummyData);
+    fetch(`${SERVER_URL}/api/products/${productId}`, { headers: headers })
+      .then(res => res.json())
+      .then(res => setFormData(res));
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -44,8 +47,18 @@ export default function DetailProduct() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetch("");
+    const params = new URLSearchParams({
+      name: formData.name,
+      price: formData.price,
+      description : formData.description
+    });
+
+    fetch(`${SERVER_URL}/api/products/${productId}?${params.toString()}`, {
+      //  headers: {'Content-Type' : 'multipart/form-data'}, //명시하면 안된다.
+       method:"PUT"
+      });
   };
+
 
   return (
     <>
@@ -67,7 +80,7 @@ export default function DetailProduct() {
                     onChange={handleChange}
                     placeholder="예: 에스프레소 블렌드"
                     className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                    readOnly
+                    required
                   />
                 </div>
 
@@ -76,12 +89,12 @@ export default function DetailProduct() {
                   <label className="block text-sm font-semibold text-stone-700 mb-1">내용</label>
                   <textarea
                     name="content"
-                    value={formData.content}
+                    value={formData.description}
                     onChange={handleChange}
                     placeholder="상품에 대한 설명을 입력하세요"
                     rows={3}
                     className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                    readOnly
+                    required
                   />
                 </div>
 
@@ -91,18 +104,18 @@ export default function DetailProduct() {
                   <input
                     type="text"
                     name="image"
-                    value={formData.image}
+                    value={SERVER_URL + formData.image}
                     onChange={handleChange}
                     placeholder="https://example.com/image.jpg"
                     className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                    readOnly
+                    required
                   />
                 </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-stone-700 mb-1">이미지</label>
                   <img className="object-contain w-full"
-                  src={formData.image || "https://picsum.photos/500/500"}
+                  src={SERVER_URL + formData.image || "https://picsum.photos/500/500"}
                   alt={formData.name}
                   />
                 </div>
@@ -118,7 +131,7 @@ export default function DetailProduct() {
                       onChange={handleChange}
                       placeholder="0"
                       className="w-full pl-4 pr-10 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
-                      readOnly
+                      required
                     />
                     <span className="absolute right-3 top-2 text-stone-500">원</span>
                   </div>
@@ -129,7 +142,6 @@ export default function DetailProduct() {
                   <button
                     type="submit"
                     className="flex-1 py-3 rounded-xl bg-amber-700 text-white font-semibold hover:bg-amber-800 shadow-md shadow-amber-900/10 transition hover:cursor-pointer"
-                    onClick={() => { router.push(`api/admin/products/${productId}/edit`) }}
                   >
                     수정하기
                   </button>
