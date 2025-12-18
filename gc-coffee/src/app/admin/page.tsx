@@ -11,6 +11,7 @@ interface Product {
   image: string;
   price: string;
 }
+
 export default function Admin() {
   const router = useRouter();
 
@@ -25,46 +26,16 @@ export default function Admin() {
       .then(res => setProductList(res.data));
 
   }, []);
-  const DummyList: Product[] = [
-    {
-      productId: 1,
-      name: "시그니처 다크 블렌드",
-      content: "고소한 견과류의 풍미와 다크 초콜릿의 묵직한 바디감",
-      image: "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?q=80&w=200&h=200&fit=crop",
-      price: "18,000"
-    },
-    {
-      productId: 2,
-      name: "에티오피아 예가체프",
-      content: "은은한 꽃향기와 기분 좋은 산미가 어우러진 싱글 오리진",
-      image: "https://images.unsplash.com/photo-1580915411954-282cb1b0d780?q=80&w=200&h=200&fit=crop",
-      price: "22,000"
-    },
-    {
-      productId: 3,
-      name: "바닐라 빈 라떼",
-      content: "천연 바닐라 빈을 사용하여 깊고 부드러운 달콤함",
-      image: "https://images.unsplash.com/photo-1595434066389-0bc3013d1730?q=80&w=200&h=200&fit=crop",
-      price: "6,500"
-    },
-    {
-      productId: 4,
-      name: "콜드브루 원액",
-      content: "12시간 동안 저온에서 천천히 추출한 깔끔한 맛",
-      image: "https://images.unsplash.com/photo-1517701604599-bb29b565090c?q=80&w=200&h=200&fit=crop",
-      price: "15,000"
-    },
-    {
-      productId: 5,
-      name: "오트 사이드 카페라떼",
-      content: "유당 불내증 걱정 없는 고소한 귀리 우유 베이스 라떼",
-      image: "https://images.unsplash.com/photo-1551046710-0229a69d3701?q=80&w=200&h=200&fit=crop",
-      price: "7,000"
-    }
-  ];
+  
   const onDelete = (productId: number) => {
-
-    fetch("");
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+    fetch(SERVER_URL + `/api/products/${productId}`,{headers:headers,method:"DELETE"})
+    .then((res) => {
+      if (!res.ok) {
+        return res.json().then((error) => { throw error; });
+      }
+      return res.json(); 
+    }).catch((err=>alert("삭제에러 : " + err)));
   };
 
   return (
@@ -90,7 +61,7 @@ export default function Admin() {
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-100">
-              {DummyList.map((p) => (
+              {productList.map((p) => (
                 <tr key={p.productId} className="hover:bg-amber-50/50 transition-colors hover:cursor-pointer"
                   onClick={(e) => {
                     router.push(`admin/products/${p.productId}`);
