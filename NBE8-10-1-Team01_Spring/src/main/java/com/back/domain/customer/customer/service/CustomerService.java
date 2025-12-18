@@ -29,8 +29,8 @@ public class CustomerService {
         // 관리자 이메일 체크
         if (ADMIN_EMAIL.equals(email)) {
             return CustomerLoginResponse.builder()
-                    .message("로그인 완료되었습니다")
-                    .redirectUrl(ADMIN_REDIRECT_URL)
+                    .customerId(null)
+                    .message("관리자 로그인 완료되었습니다")
                     .build();
         }
 
@@ -48,8 +48,8 @@ public class CustomerService {
 
         // 고객 리다이렉트
         return CustomerLoginResponse.builder()
+                .customerId(customer.getId())
                 .message("로그인 완료되었습니다")
-                .redirectUrl(CUSTOMER_REDIRECT_URL)
                 .build();
     }
 }
