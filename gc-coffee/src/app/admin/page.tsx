@@ -73,8 +73,10 @@ export default function Admin() {
         <section className="max-w-5xl mx-auto bg-white rounded-xl shadow-sm overflow-hidden border border-stone-200 pt-32 pb-20 px-4">
           <div className="flex items-center justify-between border-b mb-4 pb-2">
             <h2 className="text-3xl font-semibold text-amber-900">상품</h2>
-            <button className="px-4 hover:cursor-pointer bg-amber-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition"
-              onClick={() => { router.push("/admin/products/new") }}>등록</button>
+            <div className="flex gep-2">
+              <button className="px-4 bg-stone-200 text-stone-700 py-2 rounded-lg text-sm font-medium hover:bg-stone-300 transition" onClick={() => router.push("/admin/orders")}>주문 내역</button>
+              <button className="px-4 hover:cursor-pointer bg-amber-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-amber-700 transition" onClick={() => { router.push("/admin/products/new") }}>등록</button>
+            </div>
           </div>
 
           <table className="w-full text-left border-collapse">
