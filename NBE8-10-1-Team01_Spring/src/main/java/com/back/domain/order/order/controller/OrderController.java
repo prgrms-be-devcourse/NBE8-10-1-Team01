@@ -74,26 +74,36 @@ public class OrderController {
     )
     @ApiResponse(
             responseCode = "200",
-            description = "주문 아이템 조회 성공",
+            description = "고객 주문 내역 조회 성공",
             content = @Content(
                     mediaType = "application/json",
                     schema = @Schema(implementation = OrderListResponse.class),
                     examples = @ExampleObject(
-                            name = "주문 아이템 목록 예시",
+                            name = "고객 주문 내역 목록 예시",
                             value = """
                                     {
                                       "data": [
                                         {
-                                          "productId": 2,
-                                          "productName": "수정",
-                                          "count": 2,
-                                          "price": 1000
-                                        },
-                                        {
-                                          "productId": 3,
-                                          "productName": "선풍기",
-                                          "count": 1,
-                                          "price": 50000
+                                          "orderId": 1,
+                                          "customerId": 1,
+                                          "customerEmail": "test@example.com",
+                                          "customerAddress": "서울시 강남구",
+                                          "customerPostcode": "12345",
+                                          "createDate": "2025-12-17T10:30:00",
+                                          "orderItems": [
+                                            {
+                                              "productId": 2,
+                                              "productName": "수정",
+                                              "count": 2,
+                                              "price": 1000
+                                            },
+                                            {
+                                              "productId": 3,
+                                              "productName": "선풍기",
+                                              "count": 1,
+                                              "price": 50000
+                                            }
+                                          ]
                                         }
                                       ]
                                     }
@@ -115,7 +125,7 @@ public class OrderController {
                     )
             )
     )
-    public ResponseEntity<OrderListResponse<List<OrderItemDto>>> getUserOrders(@PathVariable Long customerId) {
+    public ResponseEntity<OrderListResponse<List<OrderDto>>> getUserOrders(@PathVariable Long customerId) {
         return ResponseEntity.ok(OrderListResponse.of(orderService.getUserOrders(customerId)));
     }
 
