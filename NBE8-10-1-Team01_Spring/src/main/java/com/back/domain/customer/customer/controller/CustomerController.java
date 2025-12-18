@@ -45,6 +45,15 @@ public class CustomerController {
                                               "message": "로그인 완료되었습니다"
                                             }
                                             """
+                            ),
+                            @ExampleObject(
+                                    name = "관리자 로그인",
+                                    value = """
+                                            {
+                                              "customerId": null,
+                                              "message": "관리자 로그인 완료되었습니다"
+                                            }
+                                            """
                             )
                     }
             )
