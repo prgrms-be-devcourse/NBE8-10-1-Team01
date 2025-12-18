@@ -34,6 +34,7 @@ public class ProductService {
             ProductListResponse.ProductDto dto = new ProductListResponse.ProductDto();
             dto.setProductId(product.getId());
             dto.setName(product.getName());
+            dto.setDescription(product.getDescription());
             dto.setPrice(product.getPrice());
             dto.setImage("/api/products/images/" + product.getImagePath());
 
