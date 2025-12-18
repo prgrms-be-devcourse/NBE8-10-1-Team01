@@ -33,11 +33,15 @@ public class OrderService {
     private final CustomerRepository customerRepository;
 
     @Transactional(readOnly = true)
-    public List<OrderItemDto> getUserOrders(Long customerId) {
-        return orderRepository.findByCustomer_IdOrderByCreateDateDesc(customerId)
+    public List<OrderDto> getUserOrders(Long customerId) {
+        return orderRepository.findAll()
                 .stream()
-                .flatMap(order -> order.getOrderItems().stream())
-                .map(OrderItemDto::new)
+                .filter(order ->
+                        order.getCustomer() != null
+                                && order.getCustomer().getId() != null
+                                && order.getCustomer().getId().equals(customerId)
+                )
+                .map(OrderDto::new)
                 .toList();
     }
 
@@ -48,6 +52,8 @@ public class OrderService {
                 .map(OrderDto::new)
                 .toList();
     }
+
+
 
     public OrderCreateResponse createOrder(OrderCreateRequest request) {
         validateOrderRequest(request);
