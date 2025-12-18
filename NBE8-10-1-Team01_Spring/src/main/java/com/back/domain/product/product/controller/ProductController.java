@@ -1,10 +1,6 @@
 package com.back.domain.product.product.controller;
 
-import com.back.domain.product.product.dto.ProductCreateRequest;
-import com.back.domain.product.product.dto.ProductCreateResponse;
-import com.back.domain.product.product.dto.ProductDetailResponse;
-import com.back.domain.product.product.dto.ProductUpdateRequest;
-import com.back.domain.product.product.dto.ProductListResponse;
+import com.back.domain.product.product.dto.*;
 import com.back.domain.product.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -175,7 +171,7 @@ public class ProductController {
             """)
             )
     )
-    public ResponseEntity<String> updateProduct(
+    public ResponseEntity<ProductUpdateResponse> updateProduct(
             @PathVariable Long productId,
             @RequestParam(value = "name", required = false) String name,
             @RequestParam(value = "price", required = false) Integer price,
@@ -188,8 +184,9 @@ public class ProductController {
         request.setDescription(description);
 
         productService.updateProduct(productId, request, image);
-
-        return ResponseEntity.ok("상품 수정 완료");
+        ProductUpdateResponse response = new ProductUpdateResponse();
+        response.setMessage("상품 수정 완료");
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{productId}")
@@ -210,8 +207,10 @@ public class ProductController {
             """)
             )
     )
-    public ResponseEntity<String> deleteProduct(@PathVariable Long productId) {
+    public ResponseEntity<ProductDeleteResponse> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
-        return ResponseEntity.ok("상품 삭제 완료");
+        ProductDeleteResponse response = new ProductDeleteResponse();
+        response.setMessage("상품 삭제 완료");
+        return ResponseEntity.ok(response);
     }
 }
