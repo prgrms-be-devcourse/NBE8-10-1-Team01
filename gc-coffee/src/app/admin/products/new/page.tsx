@@ -7,17 +7,18 @@ import { useState } from "react";
 
 interface Product {
   name: string;
-  content: string;
+  description: string;
   image: string;
   price: string;
 }
 
 export default function NewProduct() {
   const router = useRouter();
-  
+  const [image, setImage] = useState<File | null>(null);
+
   const [formData, setFormData] = useState<Product>({
     name: '',
-    content: '',
+    description: '',
     image: '',
     price: ''
   });
@@ -29,9 +30,34 @@ export default function NewProduct() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    fetch("");
+
+    const form = e.target as HTMLFormElement;
+    const nameInput = form.elements.namedItem("name") as HTMLInputElement;
+    const priceInput = form.elements.namedItem("price") as HTMLInputElement;
+    const descriptionInput = form.elements.namedItem("description") as HTMLInputElement;
+
+
+    const formData = new FormData();
+    formData.append("name", nameInput.value.trim());
+    formData.append("price", priceInput.value.trim());
+    formData.append("description", descriptionInput.value.trim());
+    if (!image) return;
+    formData.append("image", image);
+
+    const SERVER_URL = "http://localhost:8080";
+    fetch(SERVER_URL + "/api/products", {
+      method: "POST",
+      body: formData
+    }).then(res => res.json())
+      .then(res => alert(res.message));
+    router.replace("/admin");
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
 
   return (
     <>
@@ -61,8 +87,8 @@ export default function NewProduct() {
                 <div>
                   <label className="block text-sm font-semibold text-stone-700 mb-1">내용</label>
                   <textarea
-                    name="content"
-                    value={formData.content}
+                    name="description"
+                    value={formData.description}
                     onChange={handleChange}
                     placeholder="상품에 대한 설명을 입력하세요"
                     rows={3}
@@ -75,12 +101,11 @@ export default function NewProduct() {
                 <div>
                   <label className="block text-sm font-semibold text-stone-700 mb-1">이미지 URL</label>
                   <input
-                    type="text"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleChange}
-                    placeholder="https://example.com/image.jpg"
-                    className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    required
+                    className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition hover:cursor-pointer"
                   />
                 </div>
 
@@ -89,7 +114,7 @@ export default function NewProduct() {
                   <label className="block text-sm font-semibold text-stone-700 mb-1">가격</label>
                   <div className="relative">
                     <input
-                      type="text"
+                      type="number"
                       name="price"
                       value={formData.price}
                       onChange={handleChange}
@@ -106,7 +131,7 @@ export default function NewProduct() {
                   <button
                     type="button"
                     className="flex-1 py-3 rounded-xl border border-stone-300 text-stone-600 font-medium hover:bg-stone-50 transition hover:cursor-pointer"
-                    onClick={()=>router.push("/admin")}
+                    onClick={() => router.push("/admin")}
                   >
                     취소
                   </button>
