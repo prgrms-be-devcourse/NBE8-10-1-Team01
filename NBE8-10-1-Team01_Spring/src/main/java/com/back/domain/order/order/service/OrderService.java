@@ -108,10 +108,9 @@ public class OrderService {
     }
 
     public void deleteOrder(Long orderId) {
-        if (!orderRepository.existsById(orderId)) {
-            throw new OrderNotFoundException("해당 주문이 없습니다. ID: " + orderId);
-        }
-        orderRepository.deleteById(orderId);
+        Orders order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new OrderNotFoundException("해당 주문이 없습니다. ID: " + orderId));
+        orderRepository.delete(order);
     }
 
     private void validateOrderRequest(OrderCreateRequest request) {
