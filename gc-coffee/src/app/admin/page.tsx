@@ -11,6 +11,7 @@ interface Product {
   image: string;
   price: string;
 }
+
 export default function Admin() {
   const router = useRouter();
 
