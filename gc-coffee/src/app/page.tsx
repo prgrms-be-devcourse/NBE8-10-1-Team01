@@ -9,24 +9,52 @@ interface Product {
   price: string;
 }
 
+function ProductList({brandImages}:{
+  brandImages:Product[]
+}){
+  const SERVER_URL = "http://localhost:8080";
+  if (brandImages.length == 0){
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <p className="text-2xl font-bold text-amber-900">
+          입고 중입니다.
+        </p>
+      </div>
+    );
+  }
+  return(
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {brandImages.map((brand, index) => (
+              <div
+                key={index}
+                className={`rounded-2xl aspect-square flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer shadow-lg`}
+              >
+                <img src = {SERVER_URL + brand.image} ></img>
+                <p className="text-2xl font-bold text-amber-900">{brand.name}</p>
+                <p className="text-gray-600 text-sm mt-1">{brand.description}</p>
+              </div>
+            ))}
+          </div>
+  );
+}
+
 export default function Home() {
   const backgroundImage = "";
   const backgroundImageURL = `url('${backgroundImage}')`;
 
-
-  const SERVER_URL = "localhost:8080";
-  const [_brandImage,setBrandImage] = useState<Product>();
+  const SERVER_URL = "http://localhost:8080";
+  const [brandImages,setBrandImages] = useState<Product[]>([]);
   useEffect(()=>{
-    fetch("http:localhost:8080/api/products")
+    fetch(`${SERVER_URL}/api/products`)
     .then(res=>res.json())
-    .then(res=>setBrandImage(res.data))
+    .then(res=>setBrandImages(res.data))
   },[]);
 
-  const brandImages = [
-    { name: 'Ethiopia Yirgacheffe', image: 'bg-amber-100',description:"content1" },
-    { name: 'Colombia Supremo', image: 'bg-stone-200' ,description:"content2"},
-    { name: 'Kenya AA', image: 'bg-orange-100' ,description:"content3"}
-  ];
+  // const brandImages = [
+  //   { name: 'Ethiopia Yirgacheffe', image: 'bg-amber-100',description:"content1" },
+  //   { name: 'Colombia Supremo', image: 'bg-stone-200' ,description:"content2"},
+  //   { name: 'Kenya AA', image: 'bg-orange-100' ,description:"content3"}
+  // ];
 
   return (
     <div className="min-h-screen bg-amber-50">
@@ -57,24 +85,15 @@ export default function Home() {
             전 세계에서, 온라인 오프라인에서 판매합니다. 
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {brandImages.map((brand, index) => (
-              <div
-                key={index}
-                className={`${brand.image} rounded-2xl aspect-square flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer shadow-lg`}
-              >
-                <p className="text-2xl font-bold text-amber-900">{brand.name}</p>
-                <p className="text-gray-600 text-sm mt-1">{brand.description}</p>
-              </div>
-            ))}
-          </div>
+          <ProductList brandImages={brandImages}/>
+          
         </div>
       </section>
 
       {/* Footer */}
       <footer className="bg-amber-900 text-amber-100 py-4 px-4">
         <div className="max-w-7xl mx-auto">
-          <div className="border-t border-amber-800 pt-8 flex flex-col md:flex-row justify-between items-center">
+          <div className="border-amber-800 pt-3 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm mb-4 md:mb-0">© 2025 Shopify. All rights reserved.</p>
             <div className="flex items-center space-x-4">
               <a href="#" className="text-sm hover:text-orange-200 transition-colors">서비스 약관</a>
