@@ -35,7 +35,12 @@ export default function Admin() {
         return res.json().then((error) => { throw error; });
       }
       return res.json(); 
-    }).catch((err=>alert("삭제에러 : " + err)));
+    })
+    .then(()=>{
+      setProductList(productList.filter((product)=>product.productId != productId));
+    })
+    .catch((err=>alert("삭제에러 : " + err)));
+    
   };
 
   return (
