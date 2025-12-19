@@ -80,7 +80,8 @@ export default function Page() {
       await Promise.all(deletePromises);
   
       alert("모든 주문이 삭제되었습니다.");
-      router.refresh();
+      setTrackedOrderList([]);
+      
   
     } catch (error) {
       console.error(error);
