@@ -21,7 +21,8 @@ function Payment({ cart, totalAmount }: {
   const [address2, setAddress2] = useState('');
   const inputRef = useRef(null);
 
-  const handleAddressSearch = () => {
+  const handleAddressSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
     if (window.daum && window.daum.Postcode) {
       new window.daum.Postcode({
         oncomplete: function (data: any) {
@@ -54,7 +55,6 @@ function Payment({ cart, totalAmount }: {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     const form = e.target as HTMLFormElement;
 
     const emailInput = form.elements.namedItem("email") as HTMLInputElement;
@@ -128,7 +128,7 @@ function Payment({ cart, totalAmount }: {
               <button
                 type="button"
                 onClick={handleAddressSearch}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-md transition duration-150 w-2/3"
+                className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-md transition duration-150 w-2/3 cursor-pointer"
               >
                 우편번호 검색
               </button>
@@ -159,7 +159,7 @@ function Payment({ cart, totalAmount }: {
             {/* 최종 결제 버튼 */}
             <button
               type="submit"
-              className="mt-6 bg-amber-700 hover:bg-amber-800 text-white font-semibold py-3 rounded-md transition duration-200 shadow-lg"
+              className="mt-6 bg-amber-700 hover:bg-amber-800 text-white font-semibold py-3 rounded-md transition duration-200 shadow-lg cursor-pointer"
 
             >
               총 {totalAmount.toLocaleString()}원 결제하기
