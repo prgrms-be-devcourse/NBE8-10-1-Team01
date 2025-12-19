@@ -54,11 +54,19 @@ export default function Page() {
 
     const tracked = updatedItems.filter((order: Order) => {
       const date = new Date(order.createDate);
-      return date > yesterday2PM && date < today2PM;
+      if(now > today2PM){
+        return date < today2PM ? false : true
+      }else{
+        return date < yesterday2PM ?  false : true
+      }
     });
     const untracked = updatedItems.filter((order: Order) => {
       const date = new Date(order.createDate);
-      return date <= yesterday2PM || date >= today2PM;
+      if(now > today2PM){
+        return date < today2PM ? true : false
+      }else{
+        return date < yesterday2PM ?  true : false
+      }
     });
     setTrackedOrderList(tracked);
     setUnTrackedOrderList(untracked);
@@ -90,6 +98,18 @@ export default function Page() {
     }
   };
 
+  const groupByToday14 = (iso: string) => {
+    const d = new Date(iso);
+    const now = new Date();
+    const today14 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 0, 0, 0);
+    const yesterday14 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1, 14, 0, 0, 0);
+  
+    
+    
+  };
+
+
+
   return (
     <>
       <div className="min-h-screen bg-amber-50">
@@ -116,11 +136,10 @@ export default function Page() {
                 key={order.productId}
                 className="flex justify-between items-center p-4 bg-white rounded-lg shadow-md"
               >
-
                 <div className="flex flex-col">
                   <span className="font-semibold text-lg text-gray-900">{order.productName}</span>
                   <span className="text-sm text-gray-500">(수량: {order.count}개)</span>
-                  <span className="font-bold text-indigo-600 mt-1">{order.price}원</span>
+                  <span className="font-bold text-indigo-600 mt-1">총: {Number(order.price) * Number(order.count)}원</span>
                 </div>
               </li>
             ))}

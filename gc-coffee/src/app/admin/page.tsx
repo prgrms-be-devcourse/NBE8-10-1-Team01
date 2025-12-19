@@ -7,7 +7,7 @@ import { useEffect, useState } from "react";
 interface Product {
   productId: number;
   name: string;
-  content: string;
+  description: string;
   image: string;
   price: string;
 }
@@ -73,7 +73,7 @@ export default function Admin() {
                   }}>
                   <td className="p-4 text-stone-500">{p.productId}</td>
                   <td className="p-4 font-medium text-stone-900">{p.name}</td>
-                  <td className="p-4 text-stone-600">{p.content}</td>
+                  <td className="p-4 text-stone-600">{p.description}</td>
                   <td className="p-4 text-amber-800 font-semibold">{p.price.toLocaleString()}원</td>
                   <td className="p-4 text-center">
                     <button

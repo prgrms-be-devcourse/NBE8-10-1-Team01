@@ -17,12 +17,22 @@ type BO = {
  * 주문을 "당일 14시" 기준으로 분류
  * - 14시 이전 주문  -> 배송중
  * - 14시 이후 주문  -> 주문완료
+ * -취소가 가능한 주문 : 전날14시부터 오늘14시까지 
+ * -오늘 14시가 넘어가면 배송완료로 바뀜
+ * 오후14시 정각 발송
  */
 const groupByToday14 = (iso: string) => {
   const d = new Date(iso);
   const now = new Date();
   const today14 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 0, 0, 0);
-  return d < today14 ? "IN_TRANSIT" : "ORDERED";
+  const yesterday14 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1, 14, 0, 0, 0);
+
+  
+  if(now > today14){
+    return d < today14 ? "ORDERED" : "IN_TRANSIT"
+  }else{
+    return d < yesterday14 ?  "ORDERED" : "IN_TRANSIT"
+  }
 };
 
 export default function AdminOrdersPage() {
