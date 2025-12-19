@@ -54,11 +54,19 @@ export default function Page() {
 
     const tracked = updatedItems.filter((order: Order) => {
       const date = new Date(order.createDate);
-      return date > yesterday2PM && date < today2PM;
+      if(now > today2PM){
+        return date < today2PM ? false : true
+      }else{
+        return date < yesterday2PM ?  false : true
+      }
     });
     const untracked = updatedItems.filter((order: Order) => {
       const date = new Date(order.createDate);
-      return date <= yesterday2PM || date >= today2PM;
+      if(now > today2PM){
+        return date < today2PM ? true : false
+      }else{
+        return date < yesterday2PM ?  true : false
+      }
     });
     setTrackedOrderList(tracked);
     setUnTrackedOrderList(untracked);
@@ -89,6 +97,18 @@ export default function Page() {
       router.refresh(); 
     }
   };
+
+  const groupByToday14 = (iso: string) => {
+    const d = new Date(iso);
+    const now = new Date();
+    const today14 = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 14, 0, 0, 0);
+    const yesterday14 = new Date(now.getFullYear(), now.getMonth(), now.getDate()-1, 14, 0, 0, 0);
+  
+    
+    
+  };
+
+
 
   return (
     <>
