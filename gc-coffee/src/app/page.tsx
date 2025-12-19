@@ -9,11 +9,11 @@ interface Product {
   price: string;
 }
 
-function ProductList({brandImages}:{
-  brandImages:Product[]
-}){
+function ProductList({ brandImages }: {
+  brandImages: Product[]
+}) {
   const SERVER_URL = "http://localhost:8080";
-  if (brandImages.length == 0){
+  if (brandImages.length == 0) {
     return (
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <p className="text-2xl font-bold text-amber-900">
@@ -22,20 +22,24 @@ function ProductList({brandImages}:{
       </div>
     );
   }
-  
-  return(
+
+  return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {brandImages.map((brand, index) => (
-              <div
-                key={index}
-                className={`rounded-2xl aspect-square flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer shadow-lg`}
-              >
-                <img src = {SERVER_URL + brand.image}></img>
-                <p className="text-2xl font-bold text-amber-900">{brand.name}</p>
-                <p className="text-gray-600 text-sm mt-1">{brand.description}</p>
-              </div>
-            ))}
+      {brandImages.map((brand, index) => (
+        <div
+          key={index}
+          className={`rounded-2xl aspect-square flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer shadow-lg`}
+        >
+          <div className="relative aspect-square w-full overflow-hidden bg-gray-100">
+            <img src={SERVER_URL + brand.image}></img>
           </div>
+          <div className="flex flex-col w-full">
+            <p className="p-2 pb-0 text-2xl font-bold text-amber-900 truncate">{brand.name}</p>
+            <p className="p-2 pt-0 text-gray-600 text-sm mt-1">{brand.description}</p>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -44,12 +48,12 @@ export default function Home() {
   const backgroundImageURL = `url('${backgroundImage}')`;
 
   const SERVER_URL = "http://localhost:8080";
-  const [brandImages,setBrandImages] = useState<Product[]>([]);
-  useEffect(()=>{
+  const [brandImages, setBrandImages] = useState<Product[]>([]);
+  useEffect(() => {
     fetch(`${SERVER_URL}/api/products`)
-    .then(res=>res.json())
-    .then(res=>setBrandImages(res.data))
-  },[]);
+      .then(res => res.json())
+      .then(res => setBrandImages(res.data))
+  }, []);
 
   return (
     <div className="min-h-screen bg-amber-50">
@@ -77,11 +81,11 @@ export default function Home() {
             세계 각지에서 직구한 최상품!
           </h2>
           <p className="text-xl text-amber-700 text-center mb-16 max-w-3xl mx-auto">
-            전 세계에서, 온라인 오프라인에서 판매합니다. 
+            전 세계에서, 온라인 오프라인에서 판매합니다.
           </p>
 
-          <ProductList brandImages={brandImages}/>
-          
+          <ProductList brandImages={brandImages} />
+
         </div>
       </section>
 
