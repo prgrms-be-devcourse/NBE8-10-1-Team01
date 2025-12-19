@@ -32,6 +32,7 @@ export default function DetailProduct() {
         setFormData(data);
         if (data.image) {
           setPreview(SERVER_URL + data.image);
+
         }
       })
   }, []);
@@ -144,7 +145,7 @@ export default function DetailProduct() {
                   >
                     <span className="text-gray-400">
                       {
-                        image ? image.name : formData.name
+                        image ? image.name : preview.slice(21,50)
                       }
                     </span>
                     <span className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
