@@ -9,5 +9,14 @@ export type ProductDto  = {
 export type OrderDto ={
   product:ProductDto
   count: number;
+  createDate: string;
+}
+
+export type OrderWithCreateDateDto ={
+  productId: number;
+  productName: string;
+  price: string;
+  count: string;
+  createDate: string;
 }
 
