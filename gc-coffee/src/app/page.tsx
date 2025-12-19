@@ -31,7 +31,7 @@ function ProductList({ brandImages }: {
           className={`rounded-2xl aspect-square flex flex-col items-center justify-center hover:scale-105 transition-transform cursor-pointer shadow-lg`}
         >
           <div className="relative aspect-square w-full overflow-hidden bg-gray-100">
-            <img src={SERVER_URL + brand.image}></img>
+            <img className="w-full h-full object-cover" src={SERVER_URL + brand.image}></img>
           </div>
           <div className="flex flex-col w-full">
             <p className="p-2 pb-0 text-2xl font-bold text-amber-900 truncate">{brand.name}</p>
