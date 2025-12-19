@@ -1,46 +1,31 @@
 "use client"
 
+import { apiFetch } from "@/lib/backend/client";
+import { ProductDto } from "@/type/item";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
-interface Product {
-  productId: number;
-  name: string;
-  description: string;
-  image: string;
-  price: string;
-}
 
 export default function Admin() {
   const router = useRouter();
 
-  const [productList, setProductList] = useState<Product[]>([]);
+  const [productList, setProductList] = useState<ProductDto[]>([]);
 
-  const SERVER_URL = "http://localhost:8080";
   const headers = new Headers();
   headers.set("Content-Type", "application/json; charset=utf-8");
   useEffect(() => {
-    fetch(SERVER_URL + "/api/products", { headers: headers })
-      .then(res => res.json())
+    apiFetch("/api/products", { headers: headers })
       .then(res => setProductList(res.data));
-
   }, []);
   
   const onDelete = (productId: number) => {
     if (!confirm("정말 삭제하시겠습니까?")) return;
-    fetch(SERVER_URL + `/api/products/${productId}`,{headers:headers,method:"DELETE"})
-    .then((res) => {
-      if (!res.ok) {
-        return res.json().then((error) => { throw error; });
-      }
-      return res.json(); 
-    })
+    apiFetch(`/api/products/${productId}`,{headers:headers,method:"DELETE"})
     .then(()=>{
       setProductList(productList.filter((product)=>product.productId != productId));
     })
     .catch((err=>alert("삭제에러 : " + err)));
-    
   };
 
   return (
