@@ -95,7 +95,7 @@ function Payment({ cart, totalAmount }: {
       if (!res.ok) throw new Error("주문에 실패했습니다.");
       return res.json();
     })
-      .then(res => alert("결제가 완료되었습니다."))
+      .then(res => alert("결제가 완료되었습니다. 당일 오후 2시 이후의 주문 건은 다음 날 배송이 시작됩니다."))
       .catch(err => {
         console.error(err);
         alert("에러가 발생했습니다: " + err.message);
