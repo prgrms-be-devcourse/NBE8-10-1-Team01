@@ -2,12 +2,18 @@ package com.back.domain.order.order.dto;
 
 import com.back.domain.order.order.entity.Orders;
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Schema(description = "주문 정보")
+@Getter
+@Setter
+@NoArgsConstructor
 public class OrderDto {
 
     @Schema(description = "주문 ID", example = "1")
@@ -31,7 +37,6 @@ public class OrderDto {
     @Schema(description = "주문 상품 목록")
     private List<OrderItemDto> orderItems;
 
-
     public OrderDto(Orders order) {
         this.orderId = order.getId();
         this.customerId = order.getCustomer().getId();
@@ -43,19 +48,4 @@ public class OrderDto {
                 .map(OrderItemDto::new)
                 .collect(Collectors.toList());
     }
-    public long getOrderId() { return orderId; }
-    public long getCustomerId() { return customerId; }
-    public String getCustomerEmail() { return customerEmail; }
-    public String getCustomerAddress() { return customerAddress; }
-    public String getCustomerPostcode() { return customerPostcode; }
-    public LocalDateTime getCreateDate() { return createDate; }
-    public List<OrderItemDto> getOrderItems() { return orderItems; }
-
-    public void setOrderId(long orderId) { this.orderId = orderId; }
-    public void setCustomerId(long customerId) { this.customerId = customerId; }
-    public void setCustomerEmail(String customerEmail) { this.customerEmail = customerEmail; }
-    public void setCustomerAddress(String customerAddress) { this.customerAddress = customerAddress; }
-    public void setCustomerPostcode(String customerPostcode) { this.customerPostcode = customerPostcode; }
-    public void setCreateDate(LocalDateTime createDate) { this.createDate = createDate; }
-    public void setOrderItems(List<OrderItemDto> orderItems) { this.orderItems = orderItems; }
 }
