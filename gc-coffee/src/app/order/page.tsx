@@ -21,7 +21,13 @@ function Payment({ cart, totalAmount }: {
   const [address2, setAddress2] = useState('');
   const inputRef = useRef(null);
 
-  const handleAddressSearch = () => {
+  const handleAddressSearch = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    if (!window.daum || !window.daum.Postcode) {
+      alert("주소 서비스 로딩 중입니다. 잠시 후 다시 시도해주세요.");
+      return;
+    }
+
     if (window.daum && window.daum.Postcode) {
       new window.daum.Postcode({
         oncomplete: function (data: any) {
@@ -54,7 +60,6 @@ function Payment({ cart, totalAmount }: {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    e.stopPropagation();
     const form = e.target as HTMLFormElement;
 
     const emailInput = form.elements.namedItem("email") as HTMLInputElement;
@@ -62,6 +67,14 @@ function Payment({ cart, totalAmount }: {
 
     const addressInput = form.elements.namedItem("address2") as HTMLInputElement;
     addressInput.value = addressInput.value.trim();
+
+    if(postalCode === "" || addressInput.value === "" || cart.length === 0){
+      alert("필수사항을 입력해주십시오.")
+      console.log("postal"+postalCode);
+      console.log("address2"+address2);
+      console.log("cart"+cart);
+      return; 
+    }
 
     const SERVER_URL = "http://localhost:8080";
     fetch(SERVER_URL + "/api/orders", {
@@ -94,7 +107,7 @@ function Payment({ cart, totalAmount }: {
     <>
       <Script
         src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
-        strategy="beforeInteractive" // 중요: 로드 시점 지정
+        strategy="afterInteractive" 
       />
       <section className="py-16 px-4 bg-white border-t border-gray-100">
         <div className="max-w-xl mx-auto">
@@ -128,7 +141,7 @@ function Payment({ cart, totalAmount }: {
               <button
                 type="button"
                 onClick={handleAddressSearch}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-md transition duration-150 w-2/3"
+                className="bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-4 rounded-md transition duration-150 w-2/3 cursor-pointer"
               >
                 우편번호 검색
               </button>
@@ -159,7 +172,7 @@ function Payment({ cart, totalAmount }: {
             {/* 최종 결제 버튼 */}
             <button
               type="submit"
-              className="mt-6 bg-amber-700 hover:bg-amber-800 text-white font-semibold py-3 rounded-md transition duration-200 shadow-lg"
+              className="mt-6 bg-amber-700 hover:bg-amber-800 text-white font-semibold py-3 rounded-md transition duration-200 shadow-lg cursor-pointer"
 
             >
               총 {totalAmount.toLocaleString()}원 결제하기
@@ -172,9 +185,11 @@ function Payment({ cart, totalAmount }: {
   );
 }
 
-function Cart({ cart, totalAmount }: {
-  cart: Order[],
-  totalAmount: number
+function Cart({ cart, totalAmount ,addToCart,minusToCart}: {
+  cart: Order[];
+  totalAmount: number;
+  addToCart: (product: Product) => void;
+  minusToCart: (product: Product) => void;
 }) {
   return (
     <section className="py-16 px-4 bg-white">
@@ -194,7 +209,13 @@ function Cart({ cart, totalAmount }: {
             {cart.map((item) => (
               <tr key={item.product.productId} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{item.product.name}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">{item.count}개</td>
+                <td className="px-6 py-4 whitespace-nowrap text-sm text-center text-gray-500">
+                  <button className="px-4 bg-amber-100 text-stone-700 py-2 rounded-lg text-sm font-medium hover:bg-amber-200 transition mx-2 cursor-pointer"
+                  onClick={()=>minusToCart(item.product)}>-</button>
+                  {item.count}개
+                  <button className="px-4 bg-amber-100 text-stone-700 py-2 rounded-lg text-sm font-medium hover:bg-amber-200 transition mx-2 cursor-pointer"
+                  onClick={()=>addToCart(item.product)}>+</button>
+                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-500">{item.product.price.toLocaleString()}원</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-gray-800">{(item.count * Number(item.product.price)).toLocaleString()}원</td>
               </tr>
@@ -212,15 +233,17 @@ function Cart({ cart, totalAmount }: {
   );
 }
 
-function CartAndPayment({ cart }: {
-  cart: Order[]
+function CartAndPayment({ cart,addToCart,minusToCart }: {
+  cart: Order[];
+  addToCart: (product: Product) => void;
+  minusToCart: (product: Product) => void;
 }) {
 
   const totalAmount = cart.reduce((acc, item) => acc + item.count * Number(item.product.price), 0);
 
   return (
     <>
-      <Cart cart={cart} totalAmount={totalAmount} />
+      <Cart cart={cart} totalAmount={totalAmount} addToCart={addToCart} minusToCart={minusToCart} />
       <Payment cart={cart} totalAmount={totalAmount} />
     </>
   );
@@ -255,7 +278,7 @@ function ItemList({ addToCart }: any) {
   return (
     <>
       <section className="pt-32 pb-2 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-semibold mb-8 text-amber-900 border-b pb-2">오늘의 추천 원두</h2>
           <div className="flex space-x-6 overflow-x-auto pb-4">
             {productList.map((item, idx) => (
@@ -302,10 +325,27 @@ export default function Home() {
     }
   };
 
+  const minusToCart = (product: Product) => {
+    const isExist = cart.find((item) => item.product.productId === product.productId);
+    if (isExist) {
+      const isOne = cart.find((item) => item.product.productId === product.productId && item.count === 1);
+      if(!isOne){
+        setCart(cart.map((cartItem) => {
+          if (cartItem.product.productId == product.productId) {
+            return { ...cartItem, count: cartItem.count - 1 };
+          }
+          return cartItem;
+        }));
+      }else{
+        setCart(cart.filter((cartItem) => cartItem.product.productId != product.productId));
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-amber-50">
       <ItemList addToCart={addToCart} />
-      <CartAndPayment cart={cart} />
+      <CartAndPayment cart={cart} addToCart={addToCart} minusToCart={minusToCart}/>
     </div>
   );
 }
