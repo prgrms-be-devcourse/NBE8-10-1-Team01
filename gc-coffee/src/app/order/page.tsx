@@ -107,7 +107,7 @@ function Payment({ cart, totalAmount }: {
     <>
       <Script
         src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
-        strategy="beforeInteractive" 
+        strategy="afterInteractive" 
       />
       <section className="py-16 px-4 bg-white border-t border-gray-100">
         <div className="max-w-xl mx-auto">
@@ -278,7 +278,7 @@ function ItemList({ addToCart }: any) {
   return (
     <>
       <section className="pt-32 pb-2 px-4 bg-gray-50">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-semibold mb-8 text-amber-900 border-b pb-2">오늘의 추천 원두</h2>
           <div className="flex space-x-6 overflow-x-auto pb-4">
             {productList.map((item, idx) => (
