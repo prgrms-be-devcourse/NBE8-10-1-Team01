@@ -116,11 +116,10 @@ export default function Page() {
                 key={order.productId}
                 className="flex justify-between items-center p-4 bg-white rounded-lg shadow-md"
               >
-
                 <div className="flex flex-col">
                   <span className="font-semibold text-lg text-gray-900">{order.productName}</span>
                   <span className="text-sm text-gray-500">(수량: {order.count}개)</span>
-                  <span className="font-bold text-indigo-600 mt-1">{order.price}원</span>
+                  <span className="font-bold text-indigo-600 mt-1">총: {Number(order.price) * Number(order.count)}원</span>
                 </div>
               </li>
             ))}
