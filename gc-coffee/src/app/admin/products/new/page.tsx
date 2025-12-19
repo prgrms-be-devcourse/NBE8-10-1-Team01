@@ -1,21 +1,14 @@
 "use client"
 
+import { apiFetch } from "@/lib/backend/client";
+import { ProductDto } from "@/type/item";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
+function ImageForm() {
 
-interface Product {
-  name: string;
-  description: string;
-  image: string;
-  price: string;
-}
-
-export default function NewProduct() {
-  const router = useRouter();
   const [image, setImage] = useState<File | null>(null);
-
   const [preview, setPreview] = useState("");
 
   useEffect(() => {
@@ -27,13 +20,57 @@ export default function NewProduct() {
 
     return () => URL.revokeObjectURL(url);
   }, [image]);
-  
 
-  const [formData, setFormData] = useState<Product>({
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setImage(e.target.files[0]);
+    }
+  };
+
+  return (
+    <>
+      <div>
+        <label className="block text-sm font-semibold text-stone-700 mb-1">이미지</label>
+        <label
+          htmlFor="file-upload"
+          className="cursor-pointer flex items-center justify-between border border-stone-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition"
+        >
+          <span className="text-gray-400">
+            {
+              image ? image.name : ""
+            }
+          </span>
+          <span className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+            찾아보기
+          </span>
+        </label>
+        <input
+          type="file"
+          id="file-upload"
+          accept="image/*"
+          onChange={handleFileChange}
+          className="hidden w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition hover:cursor-pointer" />
+      </div>
+      {
+        preview &&
+        <img className="object-contain w-full"
+          src={preview}
+          alt={"이미지 로딩 중"}
+        />
+      }
+    </>
+  );
+}
+
+export default function NewProduct() {
+  const router = useRouter();
+
+  const [formData, setFormData] = useState<ProductDto>({
     name: '',
     description: '',
     image: '',
-    price: ''
+    price: '',
+    productId: -1, //이 페이지에서 사용하지 않음
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -49,7 +86,6 @@ export default function NewProduct() {
     const priceInput = form.elements.namedItem("price") as HTMLInputElement;
     const descriptionInput = form.elements.namedItem("description") as HTMLInputElement;
 
-
     const formData = new FormData();
     formData.append("name", nameInput.value.trim());
     formData.append("price", priceInput.value.trim());
@@ -57,19 +93,12 @@ export default function NewProduct() {
     if (!image) return;
     formData.append("image", image);
 
-    const SERVER_URL = "http://localhost:8080";
-    fetch(SERVER_URL + "/api/products", {
+    apiFetch("/api/products", {
       method: "POST",
       body: formData
-    }).then(res => res.json())
+    })
       .then(res => alert(res.message));
     router.replace("/admin");
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(e.target.files[0]);
-    }
   };
 
   return (
@@ -111,34 +140,7 @@ export default function NewProduct() {
                 </div>
 
                 {/* 이미지 URL */}
-                <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-1">이미지</label>
-                  <label
-                    htmlFor="file-upload"
-                    className="cursor-pointer flex items-center justify-between border border-stone-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition"
-                  >
-                    <span className="text-gray-400">
-                      {
-                        image ? image.name : ""
-                      }
-                    </span>
-                    <span className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
-                      찾아보기
-                    </span>
-                  </label>
-                  <input
-                    type="file"
-                    id="file-upload"
-                    accept="image/*"
-                    onChange={handleFileChange}
-                    className="hidden w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition hover:cursor-pointer" />
-                </div>
-                {preview &&
-                  <img className="object-contain w-full"
-                    src={preview}
-                    alt={formData.name}
-                  />
-                }
+                <ImageForm />
 
                 {/* 가격 */}
                 <div>
