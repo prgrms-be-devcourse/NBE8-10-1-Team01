@@ -4,3 +4,7 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop  # 서버 시작 시 테이블 삭제 후 재생성

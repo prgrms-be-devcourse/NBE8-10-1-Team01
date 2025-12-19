@@ -5,8 +5,6 @@ import com.back.domain.product.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -18,7 +16,6 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @Table(name = "orders")
 @Getter
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class Orders {
 
     @Id
@@ -32,7 +29,6 @@ public class Orders {
     @OneToMany(mappedBy = "orders", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
-    @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createDate;
 
@@ -44,5 +40,20 @@ public class Orders {
     public void addItem(Product product, int count) {
         OrderItem item = new OrderItem(this, product, count);
         this.orderItems.add(item);
+    }
+
+    public void setCreateDateForTest(LocalDateTime createDate) {
+        this.createDate = createDate;
+    }
+
+    /**
+     * JPA 저장 전 createDate가 null이면 현재 시간으로 설정
+     * 수동으로 설정된 경우 그대로 유지
+     */
+    @PrePersist
+    protected void onCreate() {
+        if (this.createDate == null) {
+            this.createDate = LocalDateTime.now();
+        }
     }
 }
