@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 interface Product {
@@ -15,6 +15,19 @@ interface Product {
 export default function NewProduct() {
   const router = useRouter();
   const [image, setImage] = useState<File | null>(null);
+
+  const [preview, setPreview] = useState("");
+
+  useEffect(() => {
+    if (!image) {
+      return;
+    }
+    const url = URL.createObjectURL(image);
+    setPreview(url);
+
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
+  
 
   const [formData, setFormData] = useState<Product>({
     name: '',
@@ -99,15 +112,33 @@ export default function NewProduct() {
 
                 {/* 이미지 URL */}
                 <div>
-                  <label className="block text-sm font-semibold text-stone-700 mb-1">이미지 URL</label>
+                  <label className="block text-sm font-semibold text-stone-700 mb-1">이미지</label>
+                  <label
+                    htmlFor="file-upload"
+                    className="cursor-pointer flex items-center justify-between border border-stone-300 rounded-lg px-4 py-2 hover:bg-gray-50 transition"
+                  >
+                    <span className="text-gray-400">
+                      {
+                        image ? image.name : ""
+                      }
+                    </span>
+                    <span className="bg-blue-500 text-white px-3 py-1 rounded text-sm">
+                      찾아보기
+                    </span>
+                  </label>
                   <input
                     type="file"
+                    id="file-upload"
                     accept="image/*"
                     onChange={handleFileChange}
-                    required
-                    className="w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition hover:cursor-pointer"
-                  />
+                    className="hidden w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition hover:cursor-pointer" />
                 </div>
+                {preview &&
+                  <img className="object-contain w-full"
+                    src={preview}
+                    alt={formData.name}
+                  />
+                }
 
                 {/* 가격 */}
                 <div>
