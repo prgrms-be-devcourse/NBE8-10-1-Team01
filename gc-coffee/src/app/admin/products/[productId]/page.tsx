@@ -74,6 +74,7 @@ export default function DetailProduct() {
     .then(res => {
       if (res.ok){
         alert("수정되었습니다.");
+        router.replace("/admin");
       }else{
         alert("수정에 실패하셨습니다.");
       }
