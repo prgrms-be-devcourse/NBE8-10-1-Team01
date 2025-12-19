@@ -47,6 +47,7 @@ function ImageForm() {
         <input
           type="file"
           id="file-upload"
+          name="image"
           accept="image/*"
           onChange={handleFileChange}
           className="hidden w-full px-4 py-2 rounded-lg border border-stone-300 focus:ring-2 focus:ring-amber-500 focus:border-amber-500 outline-none transition hover:cursor-pointer" />
@@ -85,13 +86,15 @@ export default function NewProduct() {
     const nameInput = form.elements.namedItem("name") as HTMLInputElement;
     const priceInput = form.elements.namedItem("price") as HTMLInputElement;
     const descriptionInput = form.elements.namedItem("description") as HTMLInputElement;
+    const imageInput = form.elements.namedItem("image") as HTMLInputElement;
+    const imageFile = imageInput.files?.[0];
 
     const formData = new FormData();
     formData.append("name", nameInput.value.trim());
     formData.append("price", priceInput.value.trim());
     formData.append("description", descriptionInput.value.trim());
-    if (!image) return;
-    formData.append("image", image);
+    if (!imageFile) return;
+    formData.append("image", imageFile);
 
     apiFetch("/api/products", {
       method: "POST",
