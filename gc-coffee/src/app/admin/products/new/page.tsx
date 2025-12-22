@@ -62,8 +62,8 @@ export default function NewProduct() {
       method: "POST",
       body: formData
     }).then(res => res.json())
-      .then(res => alert(res.message));
-    router.replace("/admin");
+      .then(res => alert("등록되었습니다"))
+      .then(()=>router.replace("/admin"));
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
